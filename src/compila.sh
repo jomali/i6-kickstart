@@ -3,9 +3,9 @@
 #===============================================================================
 # Script para compilar y ejecutar relatos interactivos programados en Inform 6.
 # Herramientas utilizadas:
-#	<>	inform:			Compilador Inform 6
 #	<>	bresc:			Blorb resource compiler (sólo en Glulx)
 #	<>	gargoyle-free:	Intérprete multi-plataforma
+#	<>	inform:			Compilador Inform 6
 #-------------------------------------------------------------------------------
 
 bresc_location=~/data/bin
