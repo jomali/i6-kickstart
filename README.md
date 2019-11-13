@@ -1,6 +1,6 @@
-# Historia de Grisóstomo y Marcela
+# Kickstart
 
-Una escena pastoral interactiva de J. Francisco Martín Lisaso.
+Conjunto de ficheros y utilidades para la creación de una ficción interactiva mínima en Inform 6. Implementa rutinas genéricas (con lógica común a potencialmente cualquier obra de ficción interactiva escrita en I6), e integra las extensiones del repositorio: <https://github.com/jomali/i6-libs>.
 
 
 ### Licencia
@@ -11,4 +11,4 @@ Este programa se distribuye con la esperanza de que sea útil, pero SIN GARANTÍ
 
 Debería haber recibido una copia de la Licencia Pública General GNU junto a este programa. En caso contrario, consulte <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2018, J. Francisco Martín
+Copyright (c) 2019, J. Francisco Martín
