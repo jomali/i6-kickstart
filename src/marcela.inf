@@ -1,6 +1,6 @@
 !% -Cu
-!% -D
-!% -S
+!% -~D
+!% -~S
 !% -s
 !% +language_name=Spanish
 !% $MAX_STATIC_DATA=25000
@@ -89,7 +89,7 @@
 !!------------------------------------------------------------------------------
 
 Constant Story
-"KICKSTART";
+"Historia de Grisóstomo y Marcela";
 
 Constant Headline
 "Una ficción interactiva de J. Francisco Martín Lisaso, (c) 2018";
@@ -144,8 +144,6 @@ Constant DEFAULT_HYPERLINKS_STATUS_2 1;
 
 !! Referencias a los recursos multimedia en Máquina-Z:
 #Ifdef TARGET_ZCODE;
-Constant MUS_SOUNDTRACK 0;
-Constant SFX_WIND 1;
 #Endif; ! TARGET_ZCODE;
 
 #Ifndef USE_EXTENDED_LIBRARY;
@@ -351,6 +349,7 @@ Include ">marcela_lib.inf";		! Personalizaciones de la librería
 #Endif; ! USE_EXTENDED_LIBRARY;
 
 Include ">marcela_langLM.inf";	! Mensajes personalizados de la librería
+Include ">marcela_langOM.inf";	! Mensajes de los objetos
 
 #Ifdef USE_GWINDOWS;
 Include "gwincls.h";			! GWindows: Window Class Framework
@@ -826,9 +825,9 @@ Include "vorple-screen-effects.h";
 	!! Establece el estilo del inventario:
 	inventory_style = ENGLISH_BIT + RECURSE_BIT + FULLINV_BIT;
 	!! Establece el PC (player character)
-	ChangePlayer(Protagonista);
+	ChangePlayer(Quijote);
 	!! Establece la localidad inicial del relato:
-	location = Localidad;
+	location = Campo;
 	!! Lookmode largo:
 	lookmode = 2;
 	!! Se evita la impresión inicial del banner
@@ -1045,12 +1044,50 @@ Extend 'cava' first
 ;
 
 !!------------------------------------------------------------------------------
+!! ##Help
+!!------------------------------------------------------------------------------
+
+Verb meta 'ayuda' 'pista' 'pistas'
+	*								-> Help
+;
+VerboIrregular "mostrar ayuda" with imperativo 'ayuda';
+
+[ HelpSub;
+	return HelpManager.new_hint();
+];
+
+!!------------------------------------------------------------------------------
 !! ##LMode2
 !!------------------------------------------------------------------------------
 
 Extend only 'normal' replace
     *								-> LMode2
 ;
+
+!!------------------------------------------------------------------------------
+!! ##MetaInsult
+!!------------------------------------------------------------------------------
+
+Verb meta 'caraculo' 'capullo' 'cretino' 'culopo' 'culopollo' 'estupido'
+	'fantoche' 'gilipollas' 'hideputa' 'hijoputa' 'imbecil' 'lerdo' 'mentecato'
+	'palurdo' 'patan' 'zopenco'
+    *								-> MetaInsult
+	* topic							-> MetaInsult
+;
+
+Extend 'mierda' replace
+    *								-> MetaInsult
+	* topic							-> MetaInsult
+;
+
+Extend 'tonto' replace
+	*								-> MetaInsult
+	* topic							-> MetaInsult
+;
+
+[ MetaInsultSub;
+	return Quijote.insulto();
+];
 
 !!------------------------------------------------------------------------------
 !! ##NoSuchVerb
@@ -1174,5 +1211,3 @@ Verb	'conversa' 'platica'
 Include ">marcela_classes.inf";
 Include ">marcela_objects.inf";
 Include ">marcela_util.inf";
-
-Include ">kickstart_utils.inf";

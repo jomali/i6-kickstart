@@ -340,78 +340,10 @@ Object	Util "(Utilities)"
 		!!	@returns {boolean} Verdadero si la versión compilada utiliza
 		!!		recursos multimedia y se lanza el efecto con éxito. Falso en
 		!!		caso contrario
-		!!	@version 1.0
+		!!	@version 2019/11/13
 		!!----------------------------------------------------------------------
-		fade_in [ track volume fade_time simple_fade_in
-			result js_track;
-			!! FIXME - si el volumen pasado como parámetro < volumen actual
-			!! FIXME - simple_fade_in
-			result = false;
-			#Ifdef TARGET_GLULX;
-
-			#Ifdef USE_DAMUSIX;
-			if (volume == 0) {
-				volume = -1;
-			}
-			if (fade_time == 0 || Damusix.EnFade()) {
-				Damusix.Volumen(track, volume);
-				if (~~Damusix.SonandoDeFondo(track)) {
-					Damusix.Tocar(track);
-				}
-			} else {
-				if (~~Damusix.SonandoDeFondo(track)) {
-					Damusix.Volumen(track, 0);
-					Damusix.Tocar(track);
-				}
-				Damusix.FadeIn(track, fade_time, volume);
-			}
-			result = true;
-			#Endif; ! USE_DAMUSIX;
-
-			#Ifdef USE_VORPLE;
-			if (isVorpleSupported()) {
-				switch (track) {
-					MUS_SOUNDTRACK:
-						js_track = "jsSoundtrack";
-						VorpleExecuteJavaScriptCommand("
-							var jsSoundtrack = new Howl({
-								src: ['resources/audio/antonio-de-cabezon_duuiensela.ogg'],
-								loop: true,
-								volume: 1.0
-							});
-						");
-						VorpleExecuteJavaScriptCommand(BuildCommand("
-							", js_track, ".volume(0);
-							", js_track, ".play();
-							result = ", js_track, ".fade(0.0, 0.75, 100);
-							console.log('Fade-in: ' + result);
-						"));
-					SFX_WIND:
-						js_track = "jsWindSFX";
-						VorpleExecuteJavaScriptCommand("
-							var jsWindSFX = new Howl({
-								src: ['resources/audio/bdvictor_wheat-in-the-wind.ogg'],
-								loop: true,
-								volume: 1.0
-							});
-						");
-						VorpleExecuteJavaScriptCommand(BuildCommand("
-							", js_track, ".volume(0);
-							", js_track, ".play();
-							result = ", js_track, ".fade(0.0, 1.0, 100);
-							console.log('Fade-in: ' + result);
-						"));
-				}
-				result = true;
-			} else {
-				result = false;
-			}
-			#Endif; ! USE_VORPLE;
-
-			#Endif; ! TARGET_GLULX;
-			!! (por evitar alertas del compilador)
-			track = volume + fade_time + simple_fade_in + js_track;
-			return result;
+		fade_in [ track volume fade_time simple_fade_in;
+			return false;
 		],
 		!!----------------------------------------------------------------------
 		!! Realiza un efecto de bajada de volumen gradual de un recurso de
@@ -447,54 +379,10 @@ Object	Util "(Utilities)"
 		!!	@returns {boolean} Verdadero si la versión compilada utiliza
 		!!		recursos multimedia y se lanza el efecto con éxito. Falso en
 		!!		caso contrario
-		!!	@version 4.1
+		!!	@version 2019/11/13
 		!!----------------------------------------------------------------------
-		fade_out [ track volume fade_time simple_fade_out post_track
-			result js_track;
-			result = false;
-			#Ifdef TARGET_GLULX;
-
-			#Ifdef USE_DAMUSIX;
-			if (Damusix.QueVolumen(track) > 0) {
-				if (fade_time == 0 || Damusix.EnFade()) {
-					if (volume == 0) Damusix.Parar(track);
-					else Damusix.Volumen(track, volume);
-					if (post_track) Damusix.Tocar(post_track);
-				} else {
-					if (simple_fade_out) {
-						Damusix.SimpleFadeOut(track, fade_time, volume);
-						if (post_track) Damusix.Tocar(post_track);
-					} else {
-						Damusix.FadeOut(track, fade_time, volume, post_track);
-					}
-				}
-				result = true;
-			}
-			#Endif; ! USE_DAMUSIX;
-
-			#Ifdef USE_VORPLE;
-			if (isVorpleSupported()) {
-				switch (track) {
-					MUS_SOUNDTRACK:	js_track = "jsSoundtrack";
-					SFX_WIND:		js_track = "jsWindSFX";
-				}
-				VorpleExecuteJavaScriptCommand(BuildCommand("
-					if (", js_track, ".playing()) {
-						result = ", js_track, ".fade(1.0, 0.0, 200);
-						console.log('Fade out: ' + result);
-					}
-				"));
-				result = true;
-			} else {
-				result = false;
-			}
-			#Endif; ! USE_VORPLE;
-
-			#Endif; ! TARGET_GLULX;
-			!! (por evitar alertas del compilador)
-			track = volume + fade_time + simple_fade_out + post_track
-				+ js_track;
-			return result;
+		fade_out [ track volume fade_time simple_fade_out post_track;
+			return false;
 		],
 		!!----------------------------------------------------------------------
 		!! Retorna el código numérico de la flexión gramatical actual utilizada
@@ -613,24 +501,10 @@ Object	Util "(Utilities)"
 		!! Javascript con las que se gestionan los sonidos.
 		!!
 		!!	@returns {boolean} Verdadero
-		!!	@version 1.0
+		!!	@version 2019/11/13
 		!!----------------------------------------------------------------------
 		initialise_multimedia [;
-			#Ifdef TARGET_GLULX;
-
-			#Ifdef USE_DAMUSIX;
-			!!		Damusix.AsignarCanal(
-			!!			SONIDO,
-			!!			CANAL [0-9],
-			!!			VOLUMEN [0-100],
-			!!			REPETICIONES (-1 para repeticiones infinitas)
-			!!		);
-			Damusix.AsignarCanal(MUS_SOUNDTRACK, 0, 100, -1);
-			Damusix.AsignarCanal(SFX_WIND, 1, 100, -1);
-			#Endif; ! USE_DAMUSIX;
-
-			#Endif; ! TARGET_GLULX;
-			return true;
+			return false;
 		],
 		!!----------------------------------------------------------------------
 		!! Reproduce un efecto de audio. En Damusix se utiliza uno de los

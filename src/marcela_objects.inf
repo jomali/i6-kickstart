@@ -42,36 +42,568 @@
 !!
 !!	TABLA DE CONTENIDOS
 !!
-!!	1)
+!!	1)	Limbo
+!!	2)	Campo
 !!
 !!------------------------------------------------------------------------------
 
 
 !!==============================================================================
 !!
-!!	1)
+!!	1)	Limbo
 !!
 !!------------------------------------------------------------------------------
 
-!! @Localidad
-Room	Localidad "(Almacén lógico)"
- has	male,
- with	gender G_MASCULINO,
-		!!------------------
+Room	Limbo "En algún lugar"
+ with	name_f	'babia' 'parte',
+		name_m	'limbo' 'lugar' 'sueno' 'vacio',
+		gender	G_MASCULINO,
+		adjectives 'algun' 'alguna',
 		description [;
-			return true;
-		],
-;
-
-!! @Protagonista
-NPC		-> Protagonista "protagonista"
- has	male proper,
- with	name_m 'personaje' 'protagonista',
-		gender G_MASCULINO,
-		!!------------------
-		description [;
-			print "Tan buen aspecto como siempre.";
+			O__M(self, 1);
+			if (self hasnt visited) O__M(self, 2);
 			new_line;
 			return true;
 		],
-;
+		clarification 0,
+ has	male;
+
+Array insultFlags -> 4; ! hasta (N-1) * 8 flags
+NPC		-> Quijote "Quijote"
+ with	name_m	'caballero' 'personaje' 'protagonista' 'quijote',
+		gender	G_MASCULINO,
+		adjectives 'andante' 'figura' 'triste',
+		description [;
+			return O__M(self, 1);
+		],
+		react_before [;
+			Inv:
+				<<Examine self>>;
+			Think:
+				if (noun == nothing) {
+					switch (self.state) {
+						0:
+							self.state++;
+							return O__M(self, 12);
+						1:
+							self.state++;
+							return O__M(self, 13);
+						2:
+							self.state++;
+							return O__M(self, 14);
+						3:
+							self.state++;
+							return O__M(self, 15);
+						default:
+							return O__M(self, 12);
+					}
+				}
+		],
+		final [;
+			new_line;
+			Util.horizontal_rule();
+			new_line;
+			O__M(self, 10);
+			Util.press_any_key();
+			new_line;
+			print (header) "FIN^";
+			Util.press_any_key();
+			new_line;
+			print (parser) "Pulsa cualquier tecla para terminar";
+			Util.press_any_key();
+			@restart;
+		],
+		insulto [
+			previous_style;
+			previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+			print (string) TEXT_STYLE_PARSER_PREFIX;
+			O__M(self, 16);
+			switch (Shuffle(16, insultFlags)) {
+				1:	O__M(self, 18);
+				2:	O__M(self, 19);
+				3:	O__M(self, 20);
+				4:	O__M(self, 21);
+				5:	O__M(self, 22);
+				6:	O__M(self, 23);
+				7:	O__M(self, 24);
+				8:	O__M(self, 25);
+				9:	O__M(self, 26);
+				10:	O__M(self, 27);
+				11:	O__M(self, 28);
+				12:	O__M(self, 29);
+				13:	O__M(self, 30);
+				14:	O__M(self, 31);
+				15:	O__M(self, 32);
+				16:	O__M(self, 33);
+			}
+			O__M(self, 17);
+			print (string) TEXT_STYLE_PARSER_SUFIX;
+			Util.set_text_style(previous_style);
+			new_line;
+			return true;
+		],
+		epilogo false,
+		golpe_del_pastor false,
+ has	male remarkable;
+
+NPC		-> Marcela "Marcela"
+ with	name_f 'cabrera' 'chica' 'dama' 'doncella' 'ganadera' 'joven' 'marcela'
+			'moza' 'muchacha' 'mujer' 'ovejera' 'pastora' 'senora' 'senorita'
+			'zagala',
+		gender G_FEMENINO,
+		adjectives 'bella' 'guapa' 'hermosa',
+		description [;
+			return O__M(self, 2);
+		],
+		before [
+			previous_style;
+			DefaultAction:
+				if (self has described) {
+					if (self.state > 0) <<Examine self>>;
+					self.state++;
+					previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print "habla con ", (name) self;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					Util.set_text_style(previous_style);
+					new_line;
+					<<TalkTo self>>;
+				}
+			TalkTo:
+				return O__M(self, 10);
+		],
+ has	concealed female proper;
+
+
+!!==============================================================================
+!!
+!!	2)	Campo
+!!
+!!------------------------------------------------------------------------------
+
+Array descriptionFlags -> 2; ! hasta 8 flags
+Room	Campo "Al pie de una peña"
+ with	name_f 'campina' 'dehesea' 'montana' 'pena' 'pradera' 'praderia'
+			'sierra',
+		name_fp 'montanas',
+		name_m 'alcornoque' 'arbol' 'arbusto' 'brezal' 'brezo' 'campo'
+			'madrono' 'olivo' 'prado',
+		name_mp 'alcornoques' 'arboles' 'arbustos' 'brezos' 'madronos' 'olivos',
+		gender G_MASCULINO,
+		description [;
+			!! Primera descripción:
+			if (self.state == 0) {
+				StartDaemon(self);
+				self.state++;
+				O__M(Ambrosio, 1);
+				new_line;
+				O__M(self, 1);
+				new_line;
+				O__M(Ambrosio, 2);
+				new_line;
+				O__M(Ambrosio, 3);
+				new_line;
+				O__M(Ambrosio, 4);
+				return true;
+			}
+			!! Antes de la aparición de Marcela:
+			if (self.state <= 8) {
+				O__M(self, 2);
+				if (Grisostomo.nombre_conocido) O__M(self, 4);
+				else O__M(self, 3);
+				O__M(self, 5);
+				new_line;
+				O__M(self, 6);
+				return true;
+			}
+			!! Aparición de Marcela:
+			if (self.state == 9) {
+				O__M(self, 11);
+				return true;
+			}
+			!! Discurso de Marcela:
+			if (self.state <= 14) {
+				switch (Shuffle(3, descriptionFlags)) {
+					1:	return O__M(self, 7);
+					2:	return O__M(self, 8);
+					3:	return O__M(self, 9);
+				}
+			}
+			if (self.state == 16) {
+				O__M(Ambrosio, 9);
+				DecisionFinal.bloqueada = true;
+				ChoiceSetManager.start(DecisionFinal);
+				return true;
+			}
+			!! Tras la partida de Marcela:
+			return O__M(self, 12);
+		],
+		react_before [;
+			CSETSelected:
+				return false;
+			default:
+				if (DecisionFinal.bloqueada) {
+					ChoiceSetManager.start(DecisionFinal);
+					return true;
+				}
+		],
+		before [;
+			Listen:
+				return O__M(Quijote, 11);
+		],
+		daemon [;
+			switch (self.state) {
+				!! Intervención de Ambrosio:
+				3:
+					Grisostomo.nombre_conocido = true;
+					new_line;
+					O__M(Ambrosio, 6);
+				5:
+					new_line;
+					O__M(Ambrosio, 7);
+				8:
+					move Marcela to self;
+					give Marcela general;
+					new_line;
+					O__M(Marcela, 1);
+				9:
+					new_line;
+					O__M(Ambrosio, 8);
+				!! Intervención de Marcela:
+				10:
+					new_line;
+					O__M(Marcela, 3);
+				12:
+					new_line;
+					O__M(Marcela, 4);
+					new_line;
+					O__M(Marcela, 5);
+				13:
+					new_line;
+					O__M(Marcela, 7);
+				14:
+					move Marcela to Limbo;
+					new_line;
+					O__M(Marcela, 8);
+					new_line;
+					O__M(Marcela, 9);
+				!! Reacción de Ambrosio:
+				16:
+					StopDaemon(self);
+					if (~~DecisionFinal.bloqueada) {
+						new_line;
+						<<Look>>;
+					}
+			}
+			self.state++;
+			return true;
+		],
+ has	male;
+
+NPC		-> Ambrosio "Ambrosio"
+ with	name_m 'ambrosio' 'cabrero' 'ganadero' 'hombre' 'muchacho' 'ovejero'
+			'pastor' 'zagal',
+		gender G_MASCULINO,
+		description [;
+			return O__M(self, 5);
+		],
+		before [
+			previous_style;
+			DefaultAction:
+				if (self has described) {
+					if (self.state > 0) <<Examine self>>;
+					self.state++;
+					previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print "habla con ", (name) self;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					Util.set_text_style(previous_style);
+					new_line;
+					<<TalkTo self>>;
+				}
+			TalkTo:
+				if (Marcela has general) <<TalkTo Personas>>;
+				else return O__M(self, 10);
+		],
+ has	concealed male proper;
+
+Atrezzo	-> Cielo "cielo"
+ with	name_f 'nube',
+		name_fp 'nubes',
+		name_m 'cielo' 'firmamento' 'sol',
+		gender G_MASCULINO,
+		description [;
+			if (Quijote.epilogo) return O__M(self, 2);
+			else O__M(self, 1);
+		],
+		react_before [;
+			Examine:
+				if (noun == u_obj) <<Examine self>>;
+		],
+ has	male;
+
+NPC		-> Grisostomo "Grisóstomo"
+ with	name_m 'cabrero' 'cadaver' 'cuerpo' 'difunto' 'fallecido' 'fiambre'
+			'ganadero' 'grisostomo' 'hombre' 'muchacho' 'muerto' 'ovejero'
+			'pastor' 'suicida' 'zagal',
+		gender G_MASCULINO,
+		description [;
+			return O__M(self, 1);
+		],
+		before [
+			previous_style;
+			DefaultAction:
+				if (self has described) {
+					if (self.state > 0) <<Examine self>>;
+					self.state++;
+					previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print "habla con ", (name) self;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					Util.set_text_style(previous_style);
+					new_line;
+					<<TalkTo self>>;
+				}
+			TalkTo:
+				return O__M(self, 2);
+		],
+		nombre_conocido false,
+ has	concealed male proper;
+
+Object	-> HelpManager "(Help Manager)"
+ with	react_before [;
+			DefaultAction:
+				if (self.hint_objects_active) {
+					self.hint_objects_active = false;
+					self.hint_objects_shown = true;
+					O__M(self, 6);
+					new_line;
+				}
+			Look:
+				if (self.hint_look_active) {
+					self.hint_look_active = false;
+					self.hint_look_shown = true;
+					O__M(self, 4);
+					new_line;
+				}
+			Use:
+				return O__M(self, 9);
+		],
+		react_after [;
+			if (self.initial_hint) {
+				self.initial_hint = false;
+				new_line;
+				return O__M(self, 1);
+			}
+		],
+		new_hint [;
+			if (~~self.hint_look_shown) {
+				self.hint_look_active = true;
+				if (self.hint_look_first) return O__M(self, 3);
+				self.hint_look_first = true;
+				return O__M(self, 2);
+			} else if (~~self.hint_objects_shown) {
+				self.hint_objects_active = true;
+				return O__M(self, 5);
+			} else {
+				return O__M(self, 7);
+			}
+		],
+ private
+		hint_look_active false,
+		hint_look_first false,
+		hint_look_shown false,
+		hint_objects_active false,
+		hint_objects_shown false,
+		initial_hint true,
+ has	scenery;
+
+Atrezzo	-> Papeles "papeles"
+ with	name_fp 'anotaciones' 'cuartillas' 'hojas' 'laminas' 'notas',
+		name_mp 'manuscritos' 'papeles' 'pliegos' 'poemas',
+		gender G_MASCULINO + G_PLURAL,
+		description [;
+			O__M(self, 1);
+			if (Grisostomo.nombre_conocido) O__M(self, 3);
+			else O__M(self, 2);
+			new_line;
+			return true;
+		],
+		before [
+			previous_style;
+			DefaultAction:
+				if (self has described) {
+					if (self.state > 0) <<Examine self>>;
+					self.state++;
+					previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print "coger ", (name) self;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					Util.set_text_style(previous_style);
+					new_line;
+					<<Take self>>;
+				}
+			Take:
+				if (Poema hasnt moved) <<Take Poema>>;
+				return O__M(self, 4);
+		],
+ has	concealed male pluralname;
+
+NPC		-> Personas "personas"
+ with	name_f 'concurrencia' 'gente' 'gentio' 'muchedumbre' 'multitud'
+			'persona',
+		name_fp 'personas',
+		name_m 'gentil' 'gentilhombre' 'hombre' 'mozo' 'pastor' 'senor'
+			'zagal',
+		name_mp 'gentiles' 'gentilhombres' 'hombres' 'mozos' 'pastores'
+			'senores' 'zagales',
+		gender G_FEMENINO + G_PLURAL,
+		description [;
+			return O__M(self, 1);
+		],
+		before [
+			previous_style;
+			DefaultAction:
+				if (self has described) {
+					previous_style = Util.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print "habla con ", (the) self;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					Util.set_text_style(previous_style);
+					new_line;
+					<<TalkTo self>>;
+				}
+			TalkTo:
+				if (Marcela has general) return O__M(self, 6);
+				switch (self.state) {
+					0:
+						self.state++;
+						Grisostomo.nombre_conocido = true;
+						return O__M(self, 2);
+					1:
+						self.state++;
+						return O__M(self, 3);
+					2:
+						!! Golpe en el pie
+						self.state++;
+						Quijote.golpe_del_pastor = true;
+						return O__M(self, 4);
+					default:
+						return O__M(self, 5);
+				}
+		],
+ has	concealed female pluralname;
+
+Item	-> Poema "poema"
+ with	name_f 'anotacion' 'cuartilla' 'hoja' 'lamina' 'nota',
+		name_m 'manuscrito' 'papel' 'pliego' 'poema',
+		gender G_MASCULINO,
+		description [;
+			O__M(self, 8);
+			if (self hasnt described) {
+				print " ";
+				<<Read self>>;
+			}
+			new_line;
+			return true;
+		],
+		before [
+			previous_style;
+			Examine:
+				if (~~IndirectlyContains(Quijote, self)) {
+					<<Take self>>;
+				}
+			Read:
+				O__M(self, 9);
+				new_line;
+				previous_style = Util.set_text_style(TEXT_STYLE_STRESSED);
+				O__M(self, 10);
+				Util.set_text_style(previous_style);
+				new_line;
+				return true;
+			Take:
+				if (self has moved) return false;
+				move self to Quijote;
+				give self moved;
+				O__M(self, 1);
+				if (Marcela in Campo) O__M(self, 3);
+				else O__M(self, 2);
+				O__M(self, 4);
+				if (Quijote.golpe_del_pastor) O__M(self, 6);
+				else O__M(self, 5);
+				return O__M(self, 7);
+		],
+ has	concealed male;
+
+Atrezzo	-> Sepultura "sepultura"
+ with	name_f 'sepultura' 'tumba',
+		name_m 'hoyo',
+		gender G_FEMENINO,
+		description [;
+			return O__M(self, 1);
+		],
+ has	female;
+
+ChoiceSet	DecisionFinal "(decisión final)"
+ with	initial_action [;
+			self.add_choice(Intervenir);
+			self.add_choice(NoHacerNada);
+		],
+		bloqueada false;
+
+ChoiceSetItem	Intervenir
+ with	entry [;
+			Util.extended_print("Intervenir", 0, -1);
+		],
+		keys 'actuar' 'intervenir',
+		reaction [
+			previous_style;
+			DecisionFinal.bloqueada = false;
+			O__M(Quijote, 2);
+			new_line;
+			O__M(Quijote, 3);
+			Util.press_any_key();
+			new_line;
+			O__M(Quijote, 4);
+			print " ";
+			O__M(Quijote, 5);
+			new_line;
+			previous_style = Util.set_text_style(TEXT_STYLE_STRESSED);
+			O__M(Sepultura, 3);
+			Util.set_text_style(previous_style);
+			Util.press_any_key();
+			new_line;
+			O__M(Quijote, 6);
+			Util.press_any_key();
+			return Quijote.final();
+		],
+		relatives NoHacerNada,
+		append_choice_set false;
+
+ChoiceSetItem	NoHacerNada
+ with	entry [;
+			Util.extended_print("No hacer nada", 0, -1);
+		],
+		keys 'no' 'hacer' 'nada' 'actuar',
+		reaction [
+			previous_style;
+			DecisionFinal.bloqueada = false;
+			O__M(Quijote, 7);
+			Util.press_any_key();
+			new_line;
+			O__M(Quijote, 8);
+			Util.press_any_key();
+			new_line;
+			O__M(Quijote, 9);
+			new_line;
+			previous_style = Util.set_text_style(TEXT_STYLE_STRESSED);
+			O__M(Sepultura, 4);
+			Util.set_text_style(previous_style);
+			Util.press_any_key();
+			new_line;
+			O__M(Quijote, 6);
+			Util.press_any_key();
+			return Quijote.final();
+		],
+		relatives Intervenir,
+		append_choice_set false;
