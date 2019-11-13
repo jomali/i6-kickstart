@@ -1,0 +1,1335 @@
+!% -Cu
+!% -~D
+!% -~S
+!% -s
+!% +language_name=Spanish
+!% $MAX_STATIC_DATA=25000
+!% $MAX_VERBSPACE=4800
+
+!!==============================================================================
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA
+!!
+!!==============================================================================
+!!
+!!	Archivo:		marcela.inf
+!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Idioma:			ES (Español)
+!!	Sistema:		Inform-INFSP 6
+!!	Plataforma:		Máquina-Z/Glulx
+!!	Versión:		1.1
+!!	Fecha:			2018/11/19
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	Este archivo forma parte de la ficción interactiva
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA.
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA es software libre: usted puede
+!!	redistribuirlo y/o modificarlo bajo los términos de la Licencia
+!!	Pública General GNU publicada por la Fundación para el Software
+!!	Libre, ya sea la versión 3 de la Licencia, o (a su elección)
+!!	cualquier versión posterior.
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA se distribuye con la esperanza de
+!!	que sea útil, pero SIN GARANTÍA ALGUNA; ni siquiera la garantía
+!!	implícita MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU para más
+!!	información.
+!!
+!!	Debería haber recibido una copia de la Licencia Pública General GNU
+!!	junto a HISTORIA DE GRISÓSTOMO Y MARCELA. En caso contrario,
+!!	consulte <http://www.gnu.org/licenses/>.
+!!
+!!	Copyright (c) 2018, J. Francisco Martín
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	HISTORIAL DE VERSIONES
+!!
+!!	1.1: 2018/11/19	Corrección de erratas, adición de sinónimos sobre objetos,
+!!					revisión de los comandos ##Think y ##Mild/##Strong.
+!!	1.0: 2018/11/18	Versión inicial.
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	TABLA DE CONTENIDOS
+!!
+!!	1)	Constantes y variables globales de la obra
+!!	2)	Reemplazos de rutinas por defecto
+!!	3)	Librerías y extensiones (parte 1 de 2)
+!!	4)	Puntos de entrada Glk
+!!	5)	Librerías y extensiones (parte 2 de 2)
+!!	6)	Puntos de entrada de la librería Inform y del resto de extensiones
+!!	7)	Gramática estándar y extendida
+!!	8)	Definición de atributos, clases y objetos
+!!
+!!------------------------------------------------------------------------------
+
+
+!!==============================================================================
+!!
+!!	1)	Constantes y variables globales de la obra
+!!
+!!------------------------------------------------------------------------------
+!!	<>	Información bibliográfica
+!!	<>	Control de las extensiones utilizadas por la obra
+!!	<>	Definiciones generales
+!!	<>	Definiciones de la librería Inform
+!!	<>	Configuración de la extensión 'choiceSet'
+!!	<>	Configuración de la interfaz gráfica con 'GWindows'
+!!	<>	Configuración de la extensión 'hyperlinks'
+!!	<>	Configuración de la librería de mensajes 'SpanishLM'
+!!	<>	Configuración de la extensión 'textStyles'
+
+!!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
+!!	Información bibliográfica
+!!------------------------------------------------------------------------------
+
+Constant Story
+"Historia de Grisóstomo y Marcela";
+
+Constant Headline
+"Una ficción interactiva de J. Francisco Martín Lisaso, (c) 2018";
+
+Constant Checking 1;
+!Release 0; Serial "181118";
+Release 1; Serial "181119";
+
+!! Descomentar para compilar la versión Web/Móvil:
+Constant VERSION_WEB_MOBILE;
+
+!!------------------------------------------------------------------------------
+!!	Control de las extensiones utilizadas por la obra
+!!------------------------------------------------------------------------------
+
+#Ifndef VERSION_WEB_MOBILE;
+!! Si no se está compilando para Web/Móvil, es que se compila para escritorio:
+Constant VERSION_DESKTOP;
+#Endif; ! VERSION_WEB_MOBILE;
+
+#Ifdef VERSION_WEB_MOBILE;
+!! Utilización de la interfaz Vorple:
+Constant USE_VORPLE;
+#Ifnot; ! VERSION_DESKTOP;
+!! Utilización del gestor de audio:
+Constant USE_DAMUSIX;
+!! Utilización de la librería GWindows:
+Constant USE_GWINDOWS;
+!! Utilización de hipervínculos Glk:
+Constant USE_HYPERLINKS;
+#Endif; ! VERSION_
+
+!! Utilización de reemplazos de rutinas por defecto de la librería:
+Constant USE_EXTENDED_LIBRARY;
+!! Utilización de mensajes personalizados de la librería:
+Constant USE_SPANISH_LM;
+
+!!------------------------------------------------------------------------------
+!!	Definiciones generales
+!!------------------------------------------------------------------------------
+
+!! Clases de objetos interactivos:
+Constant REMARKABLE_OBJECT 2;
+Constant DIRECTION_OBJECT 3;
+Constant CHOICE_OBJECT 4;
+Constant OTHER_OBJECT 1;
+
+!! Nombre del fichero de configuración:
+Constant CONFIG_FILE_NAME "marcela.params";
+
+!! Estilos de texto por defecto para las palabras destacadas:
+Constant DEFAULT_HIGHLIGHT_ST_1 TEXT_STYLE_UPRIGHT;
+Constant DEFAULT_HIGHLIGHT_ST_2 TEXT_STYLE_UPRIGHT;
+
+!! Estado por defecto de los hipervínculos:
+Constant DEFAULT_HYPERLINKS_STATUS_1 1;
+Constant DEFAULT_HYPERLINKS_STATUS_2 1;
+
+!! Referencias a los recursos multimedia en Máquina-Z:
+#Ifdef TARGET_ZCODE;
+#Endif; ! TARGET_ZCODE;
+
+#Ifndef USE_EXTENDED_LIBRARY;
+Attribute described;
+#Endif; ! USE_EXTENDED_LIBRARY;
+
+!! Se evita que Vorple reescriba las rutinas de Inform:
+#Ifdef USE_VORPLE;
+Constant VORPLE_NO_REPLACES;
+#Endif; ! USE_VORPLE;
+
+!!------------------------------------------------------------------------------
+!!	Definiciones de la librería Inform
+!!------------------------------------------------------------------------------
+
+Constant MANUAL_PRONOUNS;		! Los prons. refieren a objetos ya mencionados
+Constant NO_PLACES;				! Acciones LUGARES y OBJETOS desactivadas
+Constant NO_SCORE;				! No se lleva conteo de puntuación
+
+#Ifdef USE_SPANISH_LM;
+Constant SIN_MENSAJES;			! Se omiten los mensajes por defecto de la lib.
+#Endif; ! USE_SPANISH_LM;
+
+#Ifdef USE_EXTENDED_LIBRARY;
+Constant WITHOUT_DIRECTIONS;	! Se omiten las dir. por defecto de la lib.
+#Endif; ! USE_EXTENDED_LIBRARY;
+
+!!------------------------------------------------------------------------------
+!!	Configuración de la extensión 'choiceSet'
+!!------------------------------------------------------------------------------
+
+Constant CSET_STYLE 1;
+Constant CSET_PREFIX "[";
+Constant CSET_SUFIX "]";
+Constant CSET_MSG1 "";
+Constant CSET_MSG2 "";
+Constant CSET_COMMA " / ";
+Constant CSET_OR " / ";
+Constant CSET_NO_MSG "Listado de opciones vacío";
+
+!!------------------------------------------------------------------------------
+!!	Configuración de la interfaz gráfica con 'GWindows'
+!!------------------------------------------------------------------------------
+
+#Ifdef TARGET_GLULX;
+#Ifdef USE_GWINDOWS;
+Constant GUICONFIG_MARGIN_COLOR $F2E1C5; ! #F2E1C5
+Object	GUIConfig "(GUI Configuration)"
+ with	!!----------------------------------------------------------------------
+		graphic_window_flag true,	! estado de las ventanas gráficas
+		status_bar_height 0,		! altura de la barra de estado (en filas)
+		!!----------------------------------------------------------------------
+		!! Configuración por defecto A. Ancho de ventana >= threshold_A
+		graphic_width_A 0 0,	! (px)
+		margin_A 0 0,			! (%)
+		padding_A 0 0 8 0,		! (px)
+		threshold_A 0,			! (px)
+		!! Configuración por defecto B. Ancho de ventana >= threshold_B
+		graphic_width_B 0 0,	! (px)
+		margin_B 0 6,			! (%)
+		padding_B 0 0 8 0,		! (px)
+		threshold_B 460,		! (px)
+		!! Configuración por defecto C. Ancho de ventana >= threshold_C
+		graphic_width_C 0 0,	! (px)
+		margin_C 0 12,			! (%)
+		padding_C 0 0 8 0,		! (px)
+		threshold_C 660,		! (px)
+		!! Configuración por defecto D. Ancho de ventana >= threshold_D
+		graphic_width_D 0 0,	! (px)
+		margin_D 0 18,			! (%)
+		padding_D 0 0 8 0,		! (px)
+		threshold_D 900,		! (px)
+		!! Configuración por defecto E. Ancho de ventana >= threshold_E
+		graphic_width_E 0 0,	! (px)
+		margin_E 0 22,			! (%)
+		padding_E 0 0 8 0,		! (px)
+		threshold_E 1050,		! (px)
+		!! Configuración por defecto F. Ancho de ventana >= threshold_F
+		graphic_width_F 0 0,	! (px)
+		margin_F 0 25,			! (%)
+		padding_F 0 0 8 0,		! (px)
+		threshold_F 1224,		! (px)
+		!! Configuración por defecto G. Ancho de ventana >= threshold_G
+		graphic_width_G 0 0,	! (px)
+		margin_G 0 30,			! (%)
+		padding_G 0 0 8 0,		! (px)
+		threshold_G 1400,		! (px)
+;
+#Endif; ! USE_GWINDOWS;
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!!	Configuración de la extensión 'hyperlinks'
+!!------------------------------------------------------------------------------
+
+#Ifdef USE_HYPERLINKS;
+!! Acción por defecto utilizada al seleccionar un hipervínculo:
+Global _hyperlinks_command = "";
+#Endif; ! USE_HYPERLINKS;
+
+!!------------------------------------------------------------------------------
+!!	Configuración de la librería de mensajes 'SpanishLM'
+!!------------------------------------------------------------------------------
+
+#Ifdef USE_SPANISH_LM;
+Constant PS1 ">";				! Inductor
+
+Global FORMER__TX	= "tu antiguo ~yo~";
+Global YOURSELF__TX	= "ti mismo";
+Global CANTGO__TX	= "No puedes ir por ahí.";
+Global IS__TX		= " ves";
+Global ARE__TX		= " ves";
+Global IS2__TX		= "ves ";
+Global ARE2__TX		= "ves ";
+Global YOU__TX		= "Tú";
+Global PARTICULA_TE	= "te";
+#Ifnot;
+Default FIRST_PERSON_PRESENT	= 1;
+Default SECOND_PERSON_PRESENT	= 2;
+Default THIRD_PERSON_PRESENT	= 3;
+Default FIRST_PERSON_PAST		= 4;
+Default SECOND_PERSON_PAST		= 5;
+Default THIRD_PERSON_PAST		= 6;
+Default FIRST_PERSON_FUTURE		= 7;
+Default SECOND_PERSON_FUTURE	= 8;
+Default THIRD_PERSON_FUTURE		= 9;
+[ contigo; print "contigo"; ];
+[ IsPluralNoun; return false; ];
+#Endif; ! USE_SPANISH_LM;
+
+!!------------------------------------------------------------------------------
+!!	Configuración de la extensión 'textStyles'
+!!------------------------------------------------------------------------------
+
+!! Color frontal para el estilo de texto encabezado:
+Constant HEADER_STYLE_FGC $CD9C4D; ! #CD9C4D
+!! Color de fondo del estilo de texto Usuario 1:
+Constant USR1_STYLE_BGC	$E9CDA0; ! #E9CDA0
+
+Constant TEXT_STYLE_PARSER TEXT_STYLE_STRESSED;
+Constant TEXT_STYLE_PARSER_PREFIX "[";
+Constant TEXT_STYLE_PARSER_SUFIX "]";
+
+
+!!==============================================================================
+!!
+!!	2)	Reemplazos de rutinas por defecto
+!!
+!!------------------------------------------------------------------------------
+
+Replace BeforeSettingTextStyle;	! Lógica previa al cambiar de estilo de texto
+
+#Ifdef USE_SPANISH_LM;
+Replace ChangePlayer;			! Rutina para cambiar el objeto PC
+#Endif; ! USE_SPANISH_LM;
+
+#Ifdef USE_EXTENDED_LIBRARY;
+Replace Banner;					! Créditos generales de la aplicación
+Replace DrawStatusLine;			! Dibuja la barra de estado
+Replace ExamineSub;				! Rutina para la acción ##Examine
+Replace GetGNAOfObject;			! Rutina para obtener el GNA de un objeto
+Replace LanguageDirection;		! Imprime el nombre de las direcciones
+Replace LMode1Sub;				! Lookmode 1: Breve
+Replace LMode2Sub;				! Lookmode 2: Largo (establecido por defecto)
+Replace LMode3Sub;				! Lookmode 3: Superbreve
+Replace LookSub;				! Rutina para la acción ##Look
+Replace PSN__;					! Rutina para imprimir nombre corto de un obj.
+Replace VersionSub;				! Créditos detallados de la aplicación
+#Endif; ! USE_EXTENDED_LIBRARY;
+
+#Ifdef USE_VORPLE;
+Replace MyVorplePrompt;			! Rutina que imprime el inductor en Vorple
+#Endif; ! USE_VORPLE;
+
+
+!!==============================================================================
+!!
+!!	3)	Librerías y extensiones (parte 1 de 2)
+!!
+!!------------------------------------------------------------------------------
+
+#Ifdef TARGET_GLULX;
+#Ifdef USE_GWINDOWS;
+Include "gwindefs.h";			! GWindows: Definiciones
+#Endif; ! USE_GWINDOWS;
+#Endif; ! TARGET_GLULX;
+
+#Ifdef TARGET_GLULX;
+#Ifdef USE_VORPLE;
+Include "vorple.h";				! Funcionalidades básicas de Vorple UI
+#Endif; ! USE_VORPLE;
+#Endif; ! TARGET_GLULX;
+
+Include "Parser.h";				! Decodifica la entrada del teclado
+Include "textStyles.h";			! Selección de estilo de los textos
+
+#Ifdef USE_SPANISH_LM;
+Include "SpanishLM.h";			! Mensajes de la librería
+#Endif; ! USE_SPANISH_LM;
+
+#Ifdef USE_EXTENDED_LIBRARY;
+Include ">baron_lib.inf";		! Personalizaciones de la librería
+#Endif; ! USE_EXTENDED_LIBRARY;
+
+Include ">marcela_langLM.inf";	! Mensajes personalizados de la librería
+
+#Ifdef USE_GWINDOWS;
+Include "gwincls.h";			! GWindows: Window Class Framework
+#Endif; ! USE_GWINDOWS;
+
+
+!!==============================================================================
+!!
+!!	4)	Puntos de entrada Glk
+!!
+!!------------------------------------------------------------------------------
+!!	<>	HandleGlkEventExe() / HandleGlkEvent() / GWindowsGlkEvent()
+!!	<>	IdentifyGlkObjectExe() / IdentifyGlkObject() / GWindowsGlkIdentify()
+!!	<>	InitGlkWindowExe() / InitGlkWindow() / InitGWindows()
+!!
+!! NOTA: GWindows hace uso de los puntos de entrada Glk por defecto, por lo
+!! cuál define los suyos propios para reemplazar aquellos de la librería.
+!!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
+!! Punto de entrada para manejar eventos Glk.
+!!
+!!	@param {array} ev - Array de 4 palabras que describe el evento. ev-->0
+!!		registra un código numérico con que se determina el tipo de evento. La
+!!		rutina sólo actúa si se trata de un evento de tipo hipervínculo
+!!		(ev-->0 == 8); ev-->1 indica la ventana sobre la que se ha producido el
+!!		evento; ev-->2 el objeto o cadena de caracteres sobre el que se ha
+!!		creado el hipervínculo; ev-->3, reservado para información adicional,
+!!		no se utiliza
+!!	@param {integer} context - 0 si el evento se ha producido durante una
+!!		entrada de línea (comandos normales u otros usos de la función de la
+!!		librería 'KeyboardPrimitive()'); la aplicación debe esperar a que el
+!!		usuario pulse INTRO antes de dar respuesta para la entrada. 1 si el
+!!		evento se ha producido durante una entrada de caracter (función de la
+!!		librería 'KeyCharPrimitive()'); la aplicación responde ante cada
+!!		pulsación de tecla, como en los menús, por ejemplo
+!!	@param {array} abortres - Utilizado para cancelar la entrada de texto y
+!!		forzar una entrada particular. La longitud de la nueva entrada se
+!!		registra en 'abortres-->0'. Si es diferente de 0, los caracteres del
+!!		comando deben escribirse en el array secuencialmente desde la posición
+!!		'abortres->WORDSIZE' hasta 'abortres->(WORDSIZE+length)' (no
+!!		inclusive). No pueden superarse los 256 caracteres
+!!	@returns {integer|boolean} 2 para que la entrada de usuario sea abortada.
+!!		-1 para que la entrada de usuario continúe incluso después de una
+!!		pulsación de INTRO (para las entradas de línea) o de tecla (para las
+!!		entradas de caracter). Cualquier otro valor de retorno continuará con
+!!		la ejecución normal de la librería
+!!------------------------------------------------------------------------------
+#Ifdef TARGET_GLULX;
+#Ifdef USE_GWINDOWS;
+[ GWindowsGlkEvent ev context abortres;
+ 	return HandleGlkEventExe(ev, context, abortres);
+];
+#Ifnot;
+[ HandleGlkEvent ev context abortres;
+ 	return HandleGlkEventExe(ev, context, abortres);
+];
+#Endif; ! USE_GWINDOWS;
+[ HandleGlkEventExe ev context abortres;
+	!! Gestión de efecto de 'fade' en Damusix en tiempo real:
+	#Ifdef USE_DAMUSIX;
+	Damusix.NotificarFade(ev);
+	#Endif; ! USE_DAMUSIX;
+
+	!! Gestión de los eventos de selección de hipervínculo:
+	#Ifdef USE_HYPERLINKS;
+	if (HandleHyperlinkEvent(ev, context, abortres)) {
+		return 2; ! finaliza el turno
+	}
+	#Endif; ! USE_HYPERLINKS
+
+	ev = context + abortres; ! (por evitar alertas del compilador)
+];
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! 'IdentifyGlkObject()' permite conocer qué objetos Glk existen; útil para
+!! gestionar las directivas RESTORE, RESTART y UNDO puesto que, tras utilizar
+!! estas entradas, las variables globales con objetos Glk pueden contener
+!! valores desfasados y erróneos.
+!!
+!!	@param {integer} phase - Código numérico indicando la fase en la que se
+!!		invoca a la rutina. Toma los valores: 0, 1 o 2
+!!	@param {integer} type - 0, 1 o 2 para ventanas, 'streams' y 'filerefs',
+!!		respectivamente
+!!	@param {Object} ref
+!!	@param {integer} rock
+!!------------------------------------------------------------------------------
+#Ifdef TARGET_GLULX;
+#Ifdef USE_GWINDOWS;
+[ GWindowsGlkIdentify phase type ref rock;
+	return IdentifyGlkObjectExe(phase, type, ref, rock);
+];
+#Ifnot;
+[ IdentifyGlkObject phase type ref rock;
+	return IdentifyGlkObjectExe(phase, type, ref, rock);
+];
+#Endif; ! USE_GWINDOWS;
+[ IdentifyGlkObjectExe phase type ref rock;
+	!! Se identifican todos los objetos de sonido gestionados por Damusix:
+	#Ifdef USE_DAMUSIX;
+	Damusix.IdentificarSonidos(phase);
+	#Endif; ! USE_DAMUSIX;
+
+	phase = type + ref + rock; ! (por evitar alertas del compilador)
+];
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! 'InitGlkWindow()' es un punto de entrada es invocado por la librería cuando
+!! establece las ventanas por defecto: la ventana de texto principal, la
+!! ventana de estado y la ventana para caja de citas (en caso de utilizarlas).
+!! La ventana de texto principal y la ventana de estado son creadas al iniciar
+!! la aplicación (antes de 'Initialise()'). La ventana de citas es creada y
+!! destruida según se necesite. Este punto de entrada es invocado en 5 fases:
+!!
+!!	1)	Al inicio de la ejecución (antes incluso del punto de entrada
+!!		'Initialise()') se hace la invocación 'InitGlkWindow(0)'. Aquí se
+!!		pueden efectuar cualesquiera inicializaciones de ventanas Glk (se debe
+!!		tener en cuenta, no obstante, que las ventanas de texto principal y de
+!!		estado pueden estar ya inicializadas ---por ejemplo si el usuario acaba
+!!		de utilizar la instrucción RESTART---). Este es un buen momento para
+!!		establecer 'gg_statuswin_size' a un valor distinto de 1. Retornar 0
+!!		para proceder con el resto de inicializaciones de ventanas por defecto
+!!		de la librería, o 1 si ya se han inicializado todas las ventanas
+!!		manualmente.
+!!	2)	La librería invoca a 'InitGlkWindow(GG_MAINWIN_ROCK)' antes de crear la
+!!		ventana de texto principal. Este es un buen momento para inicializar
+!!		las recomendaciones de aspecto de la ventana de texto. Retornar 0 para
+!!		permitir que la librería continúe normalmente con la creación de la
+!!		ventana, o 1 si la ventana ya se ha creado y registrado en la variable
+!!		'gg_mainwin' manualmente.
+!!	3)	La librería invoca a 'InitGlkWindow(GG_STATUSWIN_ROCK)' antes de crear
+!!		la ventana de estado. De nuevo, se puede retornar 0 para permitir que
+!!		la librería cree la ventana normalmente, o 1 si la ventana ya se ha
+!!		creado y registrado en la variable 'gg_statuswin' manualmente.
+!!	4)	Al final de la inicialización de las ventanas Glk se invoca
+!!		'InitGlkWindow(1)'. En este momento se pueden abrir otras ventanas Glk
+!!		(o pueden abrirse igualmente en la rutina 'Initialise()').
+!!	5)	La librería invoca 'InitGlkWindow(GG_QUOTEWIN_ROCK)' antes de crear la
+!!		ventana de caja de citas. Esto no ocurre durante la inicialización de
+!!		la aplicación sino durante la ejecución, siempre que se efectúe una
+!!		impresión en la caja de citas, y la ventana es destruída después un
+!!		turno más tarde. Como siempre, se puede retornar 1 para indicar que la
+!!		ventana ya ha sido creada y registrada en 'gg_quotewin' manualmente.
+!!		(El número de líneas deseadas para la ventana puede consultarse en
+!!		'gg_arguments-->0').
+!!
+!! Independientemente de la forma en que se gestione la inicialización de las
+!! ventanas, debe tenerse en cuenta que la librería requiere de una ventana
+!! principal registrada en 'gg_mainwin'. En caso de no crear una manualmente y
+!! no permitir que la librería lo haga de manera automática, la aplicación se
+!! cerrará. Las ventanas de estado y de caja de citas, por el contrario, son
+!! completamante opcionales; la librería se comportará correctamente sin ellas.
+!!
+!! La librería GWindows hace uso del punto de entrada 'InitGlkWindow()'. En su
+!! lugar, ofrece el punto de entrada 'InitGlkWindow()', sin argumentos, que es
+!! equivalente a invocar 'InitGlkWindow(0)'. Debe establecer las variables
+!! 'Active_UI', con la raíz del árbol de ventanas; y 'Main_GWindow', con el
+!! objeto 'GWindow' que sirve de ventana principal de la aplicación. Se cumple
+!! que la variable: 'gg_mainwin == Main_GWindow.winid'.
+!!
+!!	@param {integer} winrock
+!!	@returns {integer}
+!!------------------------------------------------------------------------------
+#Ifdef TARGET_GLULX;
+#Ifdef USE_GWINDOWS;
+[ InitGWindows;
+	!! Inicializaciones de la interfaz gráfica GWindows:
+	Active_UI = rootUI;
+	Main_GWindow = textWindow;
+	return InitGlkWindowExe(GG_MAINWIN_ROCK);
+];
+#Ifnot;
+[ InitGlkWindow winrock;
+	return InitGlkWindowExe(winrock);
+];
+#Endif; ! USE_GWINDOWS;
+[ InitGlkWindowExe winrock
+	wintype;
+	if (winrock == GG_MAINWIN_ROCK) {
+		!! [0:wintype_AllTypes, 1:wintype_Pair, 2:wintype_Blank,
+		!! 3:wintype_TextBuffer, 4:wintype_TextGrid, 5:wintype_Graphics]
+		wintype = 0;
+
+	    !! Sugerencias de aspecto de 'textStyles':
+	    InitialiseStyleHints(winrock, wintype);
+
+		!! Propuestas de estilo de texto personalizado: Encabezado
+		!!		glk_stylehint_set(
+		!!			wintype_AllTypes,
+		!!			style_Header,
+		!!			stylehint_TextColor,
+		!!			HEADER_STYLE_FGC
+		!!		);
+		#Ifdef HEADER_STYLE_FGC;
+		glk($00B0, 0, 3, 7, HEADER_STYLE_FGC);
+		#Endif; ! HEADER_STYLE_FGC
+
+		!! Propuestas de estilo de texto personalizado: Usuario 1
+		!!		glk_stylehint_set(
+		!!			wintype_AllTypes,
+		!!			style_User1,
+		!!			stylehint_TextColor / stylehint_BackColor,
+		!!			USR1_STYLE_FGC / USR1_STYLE_BGC
+		!!		);
+		#Ifdef USR1_STYLE_FGC;
+		glk($00B0, 0, 9, 7, USR1_STYLE_FGC);
+		#Endif; ! USR1_STYLE_FGC;
+		#Ifdef USR1_STYLE_BGC;
+		glk($00B0, 0, 9, 8, USR1_STYLE_BGC);
+		#Endif; ! USR1_STYLE_BGC;
+
+		!! Propuestas de estilo de texto personalizado: Usuario 2
+		!!		glk_stylehint_set(
+		!!			wintype_AllTypes,
+		!!			style_User2,
+		!!			stylehint_TextColor / stylehint_BackColor,
+		!!			USR2_STYLE_FGC / USR2_STYLE_BGC
+		!!		);
+		#Ifdef USR2_STYLE_FGC;
+		glk($00B0, 0, 10, 7, USR2_STYLE_FGC);
+		#Endif; ! USR2_STYLE_FGC;
+		#Ifdef USR2_STYLE_BGC;
+		glk($00B0, 0, 10, 8, USR2_STYLE_BGC);
+		#Endif; ! USR2_STYLE_BGC;
+	}
+    !! Se continúa con el proceso normal de la librería:
+    return false;
+];
+#Endif; ! TARGET_GLULX;
+
+
+!!==============================================================================
+!!
+!!	5)	Librerías y extensiones (parte 2 de 2)
+!!
+!!------------------------------------------------------------------------------
+
+#Ifdef USE_DAMUSIX;
+Include "damusix.h";			! Administrador unificado de sonido en GLULX
+#Endif; ! USE_DAMUSIX;
+
+#Ifdef USE_GWINDOWS;
+Include "gwindows.h";			! GWindows: Reemplazos de la librería
+Include "gWindowsGUI.h";		! Interfaz gráfica adaptativa con GWindows
+#Endif; ! USE_GWINDOWS;
+
+#Ifdef TARGET_GLULX;
+Include ">kickstart.bli";		! Recursos multimedia de la aplicación
+#Endif; ! TARGET_GLULX;
+
+Include "arrays.h";				! Operaciones con arrays
+Include "capacities.h";			! Extensión a las reglas de capacidad
+Include "choiceSet.h";			! Sistema de selección de acciones sobre lista
+Include "pPreprocessor.h";		! Preprocesador del parser
+Include "shuffle.h";			! Barajeado de números aleatorios
+
+#Ifdef USE_HYPERLINKS;
+Include	"hyperlinks.h";			! Rutinas de apoyo para el uso de hipervínculos
+#Endif; ! USE_HYPERLINKS;
+
+Include "VerbLib.h";			! Define cómo trabajan las acciones
+
+#Ifdef USE_VORPLE;
+Include "vorple-command-prompt-control.h";
+Include "vorple-hyperlinks.h";
+Include "vorple-multimedia.h";
+Include "vorple-screen-effects.h";
+#Endif; ! USE_VORPLE;
+
+
+!!==============================================================================
+!!
+!!	6)	Puntos de entrada de la librería Inform y del resto de extensiones
+!!
+!!------------------------------------------------------------------------------
+!!	<>	BeforeParsing()
+!!	<>	BeforeSettingTextStyle()
+!!	<>	GamePreRoutine()
+!!	<>	Initialise()
+!!	<>	InScope()
+!!	<>	MyVorplePrompt()
+!!	<>	PrintVerb()
+!!	<>	UnknownVerb()
+!!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
+!! Permite manipular la entrada de usuario antes de que sea analizada por la
+!! librería. Es invocada después de que el sistema haya leído la entrada de
+!! texto y haya definido ya las tablas 'buffer' y 'parser', pero aún no ha
+!! hecho nada más salvo establecer el contador de palabras 'wn' a 1. La rutina
+!! puede manipular estas tablas libremente mientras permanezcan consistentes la
+!! una con la otra, y puede dejar el contador de palabras en cualquier punto.
+!!
+!!	@returns Nada
+!!------------------------------------------------------------------------------
+[ BeforeParsing;
+	ChoiceSetManager.run();
+	#Ifdef PARSING_PREPROCESSOR;
+	ParsingPreprocessor.run();
+	#Endif; ! PARSING_PREPROCESSOR;
+];
+
+!!------------------------------------------------------------------------------
+!! Permite añadir lógica antes de establecer un nuevo estilo de texto a través
+!! de la extensión 'textStyles'. Se encarga de seleccionar los estilos de texto
+!! en Vorple.
+!!
+!!	@param {integer} previous_style - Código del estilo de texto actual
+!!	@param {integer} next_style - Código del nuevo estilo de texto
+!!	@returns {boolean} Verdadero para interrumpir la ejecución normal de la
+!!		rutina de selección de estilo de texto. Falso para continuar
+!!		normalmente
+!!------------------------------------------------------------------------------
+#Ifdef TEXT_STYLES;
+[ BeforeSettingTextStyle previous_style next_style
+	applied_styles i;
+	#Ifdef USE_VORPLE;
+	if (isVorpleSupported()) {
+		!! Finaliza los estilos aplicados anteriormente:
+		if (previous_style == TEXT_STYLE_NOTE or TEXT_STYLE_QUOTE
+			or TEXT_STYLE_REVERSED) {
+			applied_styles = 2;
+		} else if (previous_style == TEXT_STYLE_STRESSED
+			or TEXT_STYLE_IMPORTANT or TEXT_STYLE_MONOSPACED
+			or TEXT_STYLE_HEADER or TEXT_STYLE_INPUT
+			or TEXT_STYLE_USER1 or TEXT_STYLE_USER2) {
+			applied_styles = 1;
+		} else { ! (previous_style == TEXT_STYLE_UPRIGHT)
+			applied_styles = 0;
+		}
+		for (i = 0 : i < applied_styles : i++) {
+			VorpleEndStyle();
+		}
+		!! Aplica los nuevos estilos:
+		switch (next_style) {
+			TEXT_STYLE_UPRIGHT:
+				;
+			TEXT_STYLE_STRESSED:
+				VorpleStyle(STYLE_EMPHASIS);
+			TEXT_STYLE_IMPORTANT:
+				VorpleStyle(STYLE_STRONG);
+			TEXT_STYLE_MONOSPACED:
+				VorpleStyle(STYLE_MONOSPACE);
+			TEXT_STYLE_REVERSED:
+				VorpleStyle(STYLE_DARK_GRAY_LETTERS);
+				VorpleStyle(STYLE_LIGHT_GRAY_BACKGROUND);
+			TEXT_STYLE_HEADER:
+				VorpleStyle(STYLE_LARGE);
+			TEXT_STYLE_NOTE:
+				VorpleStyle(STYLE_EMPHASIS);
+				VorpleStyle(STYLE_STRONG);
+			TEXT_STYLE_QUOTE:
+				VorpleStyle(STYLE_EMPHASIS);
+				VorpleStyle(STYLE_MONOSPACE);
+			TEXT_STYLE_INPUT:
+				VorpleStyle(STYLE_FANTASY);
+			TEXT_STYLE_USER1:
+				VorpleStyle(STYLE_YELLOW_BACKGROUND);
+			TEXT_STYLE_USER2:
+				VorpleStyle(STYLE_LIGHT_GRAY_LETTERS);
+		}
+	}
+	#Endif; ! USE_VORPLE;
+	previous_style = next_style + applied_styles + i;
+	!! Continúa con la ejecución normal de 'SetTextStyle()':
+	return false;
+];
+#Endif; ! TEXT_STYLES;
+
+!!------------------------------------------------------------------------------
+!! Inicializaciones del relato. Esta rutina es obligatoria y, entre otras
+!! posibles inicializaciones, DEBE ESTABLECER LA LOCALIDAD INICIAL del usuario
+!! (o el objeto accesible ---contenedor o soporte--- en el que empieza).
+!!
+!!	@returns {boolean|integer} Verdadero o falso para continuar con la
+!!		ejecución normal de la aplicación, o 2 para suprimir la impresión de
+!!		los créditos, que de otra manera se imprimirían inmediatamente después
+!!		de llamar a la rutina
+!!------------------------------------------------------------------------------
+[ Initialise;
+	Utils.erase_window();
+
+	!! Inicializaciones para la VM Glulx ---------------------------------------
+
+	!! Inicializaciones Vorple:
+	#Ifdef TARGET_GLULX;
+	#Ifdef USE_VORPLE;
+	VorpleInitialise();
+	#Endif; ! USE_VORPLE;
+	#Endif; ! TARGET_GLULX;
+
+	!! Establece la escucha de eventos glk para el uso de hipervínculos:
+	#Ifdef TARGET_GLULX;
+	#Ifdef USE_HYPERLINKS;
+	ListenHyperlinkEvents();
+	#Endif; ! USE_HYPERLINKS;
+	#Endif; ! TARGET_GLULX;
+
+	!! Lee el fichero de configuración:
+	#Ifdef TARGET_GLULX;
+	#Ifdef VERSION_DESKTOP;
+	#Ifdef CONFIG_FILE_NAME;
+	Utils.read_configuration_file(CONFIG_FILE_NAME);
+	#Endif; ! CONFIG_FILE_NAME;
+	#Endif; ! VERSION_DESKTOP;
+	#Endif; ! TARGET_GLULX;
+
+	!! Inicializa los recursos multimedia:
+
+	!! Comprobaciones del intérprete -------------------------------------------
+	#Ifdef TARGET_GLULX;
+	#Ifdef VERSION_DESKTOP;
+	!!		(~~glk_gestalt(gestalt_Graphics, 0)
+	!!		|| ~~glk_gestalt(gestalt_Sound, 0)
+	!!		|| ~~glk_gestalt(gestalt_SoundMusic, 0))
+	if (~~glk($0004, 6, 0) || ~~glk($0004, 8, 0) || ~~glk($0004, 13, 0)) {
+		print (strong) "ADVERTENCIA:", " Esta aplicación incluye contenidos
+		audiovisuales pero tu intérprete Glulx no los soporta adecuadamente y
+		no podrán ser utilizados. Se recomienda utilizar un intérprete
+		diferente para poder disfrutar de todos los contenidos gráficos y de
+		audio de la aplicación.^";
+		new_line;
+		print (parser) "Pulsa una tecla para continuar.";
+		Utils.press_any_key();
+		Utils.erase_window();
+	}
+	#Ifnot; ! VERSION_WEB_MOBILE;
+	!! XXX - La siguiente comprobación sólo funciona si previamente se invoca a
+	!! "VorpleInitialise()"
+	if (~~isVorpleSupported()) {
+		print (strong) "ADVERTENCIA:", " Estas a punto de iniciar una ",
+		(stressed) "versión reducida", " de la aplicación ideada para
+		plataformas móviles. La versión original de la aplicación utiliza
+		contenidos audiovisuales pero, puesto que las plataformas móviles no
+		los soportan, han sido desactivados. Si estás ejecutando la obra desde
+		una plataforma de escritorio se recomienda no utilizar esta versión y
+		utilizar en su lugar la versión original, con todos los recursos
+		gráficos y de audio activados.^";
+		new_line;
+		print (parser) "Pulsa una tecla para continuar.";
+		Utils.press_any_key();
+		Utils.erase_window();
+	}
+	#Endif; ! VERSION_
+	#Endif; ! TARGET_GLULX;
+
+	!! Inicializaciones de la obra ---------------------------------------------
+	!! Créditos:
+	new_line;
+	Banner();
+	new_line;
+
+	#Ifdef USE_VORPLE;
+	if (isVorpleSupported()) {
+		print (parser) "Haz clic con el ratón o pulsa una tecla";
+	} else {
+		print (parser) "Pulsa una tecla para empezar";
+	}
+	#Ifnot;
+	print (parser) "Pulsa una tecla para empezar";
+	#Endif; ! USE_VORPLE;
+	Utils.press_any_key();
+	Utils.erase_window();
+	new_line;
+	Utils.print_horizontal_rule();
+	new_line;
+
+	!! Narrador en pasado y tercera persona
+	Utils.set_grammatical_inflection(THIRD_PERSON_PAST);
+	!! Establece el estilo del inventario:
+	inventory_style = ENGLISH_BIT + RECURSE_BIT + FULLINV_BIT;
+	!! Establece el PC (player character)
+	ChangePlayer(Quijote);
+	!! Establece la localidad inicial del relato:
+	location = Limbo;
+	!! Lookmode largo:
+	lookmode = 2;
+	!! Se evita la impresión inicial del banner
+	return 2;
+];
+
+!!------------------------------------------------------------------------------
+!! Definición del foco del usuario; permite cambiar en el sistema la definición
+!! de lo que se encuentra al alcance del PC. Utiliza las rutinas de la librería
+!! 'ScopeWithin()' y 'PlaceInScope()' para establecer cuál debería ser el foco.
+!!
+!!	@returns {boolean} Falso para indicar al sistema que añada todos los
+!!		objetos que suelen estar por defecto al alcance, o verdadero para
+!!		indicar que no se debe añadir nada más al alcance
+!!------------------------------------------------------------------------------
+[ InScope person
+	item;
+	!! Aseguramos que la localidad actual está siempre en el foco del PJ:
+	PlaceInScope(real_location);
+	!! En la oscuridad, se mueven al foco todos aquellos objetos que hayan sido
+	!! manipulados ya previamente por el PC:
+	if ((person == player) && (location == thedark)) {
+		objectloop(item in parent(self))
+			if (item has moved) PlaceInScope(item);
+	}
+
+	return false;
+];
+
+!!------------------------------------------------------------------------------
+!! Permite imprimir un inductor personalizado en Vorple.
+!!
+!!	@returns {boolean} Verdadero si se imprime el inductor definido en la
+!!		constante PS1 (si es que existe y está bien definido). Falso en caso
+!!		contrario
+!!	@version 1.1
+!!------------------------------------------------------------------------------
+#Ifdef TARGET_GLULX;
+#Ifdef USE_VORPLE;
+[ MyVorplePrompt;
+	#Ifdef PS1;
+	if (metaclass(PS1) == String) {
+		print (string) PS1;
+		return true;
+	}
+	#Endif; ! PS1;
+	return false;
+];
+#Endif; ! USE_VORPLE;
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! Permite cambiar el verbo que imprime el sistema al hacer al usuario
+!! preguntas del tipo: "Intenta de nuevo porque sólo se pudo entender que
+!! quieres <lo que sea>.", en caso de que se haya definido alguna acción
+!! inusual por medio de la rutina 'UnknownVerb()'.
+!!
+!!	@param {address} word - Dirección de diccionario del verbo
+!!	@returns {boolean} Verdadero para indicar al sistema que se ha imprimido la
+!!		forma modificada del verbo, o falso para continuar con la ejecución
+!!		normal y que el sistema imprima el verbo de la forma habitual
+!!------------------------------------------------------------------------------
+[ PrintVerb word;
+	if (word == 'no.verb') {
+		print "hacer algo con";
+		return true;
+	}
+
+	return false;
+];
+
+!!------------------------------------------------------------------------------
+!! Invocada por el sistema cuando se encuentra con un verbo desconocido, de
+!! forma que pueda cambiarse por uno definido en el relato.
+!!
+!!	@returns {boolean} Falso para permitir que el sistema continúe con la
+!!		ejecución normal e imprima un mensaje de error, o un valor de
+!!		diccionario del verbo a utilizar en lugar del verbo desconocido
+!!------------------------------------------------------------------------------
+[ UnknownVerb
+	obj;
+	obj = ParsingPreprocessor.get_selected_object();
+	if (TestScope(obj, player)) {
+		verb_wordnum = 0;
+		return 'no.verb';
+	}
+
+	return false;
+];
+
+
+!!==============================================================================
+!!
+!!	7)	Gramática estándar y extendida
+!!
+!!------------------------------------------------------------------------------
+
+Include "SpanishG.h";			! Gramática española
+Include "SpanishEG.h";			! Gramática española extendida
+
+!! Elemento gramático que permite contemplar sólo el primer término de la
+!! entrada de usuario:
+[ Anything;
+	while (NextWordStopped() ~= -1);
+	return GPR_PREPOSITION;
+];
+
+!!------------------------------------------------------------------------------
+!! ##Audio / ##AudioOn / ##AudioOff
+!!------------------------------------------------------------------------------
+
+#Ifdef TARGET_GLULX;
+#Ifdef USE_DAMUSIX;
+Verb meta 'audio' 'music' 'musica' 'sonido' 'sonidos'
+	*								-> Audio
+	* 'on' / 'si'					-> AudioOn
+	* 'encendido' / 'activado'		-> AudioOn
+	* 'off' / 'no'					-> AudioOff
+	* 'apagado' / 'desactivado'		-> AudioOff
+;
+VerboIrregular "establecer la reproducción de audio" with imperativo
+	'audio' 'music' 'musica' 'sonido' 'sonidos';
+
+[ AudioSub;
+	if (Damusix.HayAudio()) <<AudioOff>>;
+	else <<AudioOn>>;
+];
+
+[ AudioOnSub;
+	if (Damusix.HayAudio())
+		print_ret (parser) "La reproducción de audio ya estaba activada.";
+	Damusix.ActivarAudio();
+	print_ret (parser) "Reproducción de audio activada.";
+];
+
+[ AudioOffSub;
+	if (~~Damusix.HayAudio())
+		print_ret (parser) "La reproducción de audio ya estaba desactivada.";
+	Damusix.DesactivarAudio();
+	print_ret (parser) "Reproducción de audio desactivada.";
+];
+#Endif; ! USE_DAMUSIX;
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! ##ConfigureHighlights
+!!------------------------------------------------------------------------------
+
+#Ifdef TARGET_GLULX;
+#Ifdef VERSION_DESKTOP;
+Verb meta 'destacado' 'resaltado'
+	*								-> ConfigureHighlights
+;
+
+VerboIrregular "establecer configuración de palabras resaltadas"
+ with	imperativo 'destacado' 'resaltado',
+;
+
+[ ConfigureHighlightsSub
+	done highlight_code i number_of_classes previous_style temp txt;
+	number_of_classes = 4;
+	txt = "INTRO";
+	Utils.set_status_bar_contents("Resaltado");
+	while (~~done) {
+		Utils.erase_window();
+		new_line;
+		print "Los nombres de los distintos objetos interactivos presentes en
+		la obra se pueden imprimir con un estilo de texto resaltado para
+		facilitar su identifición. Introduce el número de una clase de objeto
+		para rotar entre los distintos estilos de resaltado disponibles y
+		seleccionar aquel que mejor se adecue a tus preferencias personales:";
+		new_line;
+		new_line;
+		for (i = 1 : i <= number_of_classes : i++) {
+			switch (i) {
+				1:	print "1) Objetos importantes: ";
+				2:	print "2) Salidas y direcciones: ";
+				3:	print "3) Temas de conversación: ";
+				4:	print "4) Otros objetos: ";
+			}
+			highlight_code = Utils.get_highlight_style(i+1);
+			if (i == 4) highlight_code = Utils.get_highlight_style(1);
+			switch (highlight_code) {
+				TEXT_STYLE_HEADER:		temp = "enfatizado (c)";
+				TEXT_STYLE_IMPORTANT:	temp = "negrita";
+				TEXT_STYLE_MONOSPACED:	temp = "monoespaciado";
+				TEXT_STYLE_NOTE:		temp = "enfatizado (a)";
+				TEXT_STYLE_QUOTE:		temp = "enfatizado (b)";
+				TEXT_STYLE_STRESSED:	temp = "cursiva";
+				TEXT_STYLE_UPRIGHT, -1:	temp = "sin estilo";
+				TEXT_STYLE_USER1:		temp = "color de fondo";
+			}
+			previous_style = Utils.set_text_style(highlight_code);
+			print (string) temp;
+			Utils.set_text_style(previous_style);
+			print ".";
+			new_line;
+		}
+		new_line;
+		print "NOTA: El repertorio de estilos es más limitado cuando los
+		hipervínculos están activados. Puedes igualmente modificar su
+		configuración tecleando HIPERVÍNCULOS en la pantalla principal de la
+		aplicación.";
+		new_line;
+		new_line;
+		previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+		print (string) TEXT_STYLE_PARSER_PREFIX;
+		print "Pulsa @<<", (string) txt, "@>> para aceptar.";
+		print (string) TEXT_STYLE_PARSER_SUFIX;
+		Utils.set_text_style(previous_style);
+		i = 0;
+		switch (Utils.press_any_key()) {
+			32, -6: ! INTRO/ESPACIO
+				done = true;
+			'1':
+				i = 2;
+			'2':
+				i = 3;
+			'3':
+				i = 4;
+			'4':
+				i = 1;
+		}
+		if (i ~= 0) {
+			highlight_code = Utils.get_highlight_style(i);
+			switch (highlight_code) {
+				TEXT_STYLE_IMPORTANT:
+					highlight_code = TEXT_STYLE_NOTE;
+				TEXT_STYLE_MONOSPACED:
+					highlight_code = TEXT_STYLE_USER1;
+				TEXT_STYLE_NOTE:
+					highlight_code = TEXT_STYLE_QUOTE;
+				TEXT_STYLE_QUOTE:
+					highlight_code = TEXT_STYLE_MONOSPACED;
+				TEXT_STYLE_STRESSED:
+					highlight_code = TEXT_STYLE_IMPORTANT;
+				TEXT_STYLE_UPRIGHT, -1:
+					highlight_code = TEXT_STYLE_STRESSED;
+				TEXT_STYLE_USER1:
+					highlight_code = TEXT_STYLE_UPRIGHT;
+			}
+			Utils.set_highlight_style(i, highlight_code);
+		}
+	}
+	Utils.erase_window();
+	Utils.write_configuration_file(CONFIG_FILE_NAME);
+	Utils.set_status_bar_contents(0);
+	<<Look>>;
+];
+#Ifnot; ! VERSION_WEB_MOBILE;
+Verb meta 'destacado' 'resaltado'
+	* Anything						-> NoSuchVerb
+;
+
+VerboIrregular "establecer configuración de palabras resaltadas"
+ with	imperativo 'destacado' 'resaltado',
+;
+#Endif; ! VERSION_
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! ##ConfigureHyperlinks
+!!------------------------------------------------------------------------------
+
+#Ifdef TARGET_GLULX;
+#Ifdef VERSION_DESKTOP;
+Verb meta 'enlace' 'enlaces' 'hiperenlace' 'hiperenlaces' 'hipervinculo'
+	'hipervinculos' 'vinculo' 'vinculos'
+	*								-> ConfigureHyperlinks
+;
+
+VerboIrregular "establecer configuración de hipervínculos"
+ with	imperativo 'enlace' 'enlaces' 'hiperenlace' 'hiperenlaces'
+			'hipervinculo' 'hipervinculos' 'vinculo' 'vinculos',
+;
+
+[ ConfigureHyperlinksSub
+	done i number_of_classes previous_style txt;
+	number_of_classes = 4;
+	txt = "INTRO";
+	Utils.set_status_bar_contents("Hipervínculos");
+	while (~~done) {
+		Utils.erase_window();
+		new_line;
+		print "La obra permite interactuar con los distintos objetos presentes
+		en el mundo utilizando un sistema de hipervínculos (haciendo ~clic~ con
+		el ratón sobre los enlaces que vayan apareciendo). Existen cuatro
+		clases de hipervínculo: 1) asociado a objetos importantes en la
+		historia; 2) salidas y direcciones hacia las que puedes intentar
+		desplazarte; 3) temas de conversación; y 4) otros objetos interactivos.
+		Puedes activar o desactivar cada tipo de hipervínculo introduciendo el
+		número de su clase:";
+		new_line;
+		new_line;
+		for (i = 1 : i <= number_of_classes : i++) {
+			switch (i) {
+				1:	print "1) Objetos importantes: ";
+				2:	print "2) Salidas y direcciones: ";
+				3:	print "3) Temas de conversación: ";
+				4:	print "4) Otros objetos: ";
+			}
+			if (Utils.get_hyperlinks_status(i)) {
+				print "@<<activados@>>";
+			} else {
+				print (user2) "@<<desactivados@>>";
+			}
+			print ".";
+			new_line;
+		}
+		new_line;
+		previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+		print (string) TEXT_STYLE_PARSER_PREFIX;
+		print "Pulsa @<<", (string) txt, "@>> para aceptar.";
+		print (string) TEXT_STYLE_PARSER_SUFIX;
+		Utils.set_text_style(previous_style);
+		switch (Utils.press_any_key()) {
+			32, -6: ! INTRO/ESPACIO
+				done = true;
+			'1':
+				i = 1;
+			'2':
+				i = 2;
+			'3':
+				i = 3;
+			'4':
+				i = 4;
+		}
+		Utils.set_hyperlinks_status(i, ~~Utils.get_hyperlinks_status(i));
+	}
+	Utils.erase_window();
+	Utils.write_configuration_file(CONFIG_FILE_NAME);
+	Utils.set_status_bar_contents(0);
+	<<Look>>;
+];
+#Ifnot; ! VERSION_WEB_MOBILE;
+Verb meta 'enlace' 'enlaces' 'hiperenlace' 'hiperenlaces' 'hipervinculo'
+	'hipervinculos' 'vinculo' 'vinculos'
+		* Anything						-> NoSuchVerb
+;
+
+VerboIrregular "establecer configuración de hipervínculos"
+ with	imperativo 'enlace' 'enlaces' 'hiperenlace' 'hiperenlaces'
+			'hipervinculo' 'hipervinculos' 'vinculo' 'vinculos',
+;
+#Endif; ! VERSION_
+#Endif; ! TARGET_GLULX;
+
+!!------------------------------------------------------------------------------
+!! ##DefaultAction
+!!------------------------------------------------------------------------------
+
+Verb 'no.verb'
+	* noun							-> DefaultAction
+;
+
+[ DefaultActionSub;
+	!! Por evitar redundancias, cuando la instrucción por defecto lanza
+	!! ##Examine no se muestra aclaración de la entrada.
+	!! 		previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+	!! 		print (string) TEXT_STYLE_PARSER_PREFIX;
+	!! 		print "examina ", (name) noun;
+	!! 		print (string) TEXT_STYLE_PARSER_SUFIX;
+	!! 		Utils.set_text_style(previous_style);
+	!! 		new_line;
+	<<Examine noun>>;
+];
+
+!!------------------------------------------------------------------------------
+!! ##Dig
+!!------------------------------------------------------------------------------
+
+Extend 'cava' first
+	*								-> Dig
+;
+
+!!------------------------------------------------------------------------------
+!! ##LMode2
+!!------------------------------------------------------------------------------
+
+Extend only 'normal' replace
+    *								-> LMode2
+;
+
+!!------------------------------------------------------------------------------
+!! ##NoSuchVerb
+!!------------------------------------------------------------------------------
+!! Permite eliminar acciones definidas automáticamente por la librería Inform.
+!! Código extraído de <http://www.firthworks.com/roger/informfaq/vv.html#6>.
+!!------------------------------------------------------------------------------
+
+Extend 'nx' replace
+	* Anything						-> NoSuchVerb
+;
+
+Extend	'perdona' replace
+	* Anything						-> NoSuchVerb
+;
+
+[ NoSuchVerbSub; return ParserError(VERB_PE); ];
+
+!!------------------------------------------------------------------------------
+!! ##TalkOn / ##TalkTo
+!!------------------------------------------------------------------------------
+
+Extend	'habla' replace
+	* noun							-> TalkTo
+	* 'a'/'con' noun				-> TalkTo
+	* creature						-> TalkTo
+	* 'a'/'con' creature			-> TalkTo
+	* 'por' noun					-> TalkOn
+	* 'por' creature				-> TalkOn
+;
+
+Verb	'conversa' 'platica'
+	* noun							-> TalkTo
+	* 'a'/'con' noun				-> TalkTo
+	* creature						-> TalkTo
+	* 'a'/'con' creature			-> TalkTo
+	* 'por' noun					-> TalkOn
+	* 'por' creature				-> TalkOn
+;
+
+[ TalkOnSub
+	previous_style;
+	previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+	print (string) TEXT_STYLE_PARSER_PREFIX;
+	print "Hablar con ", (name) noun;
+	print (string) TEXT_STYLE_PARSER_SUFIX;
+	Utils.set_text_style(previous_style);
+	new_line;
+	<<TalkTo noun second>>;
+];
+
+[ TalkToSub;
+	!! 1) El personaje intenta hablar consigo mismo:
+	if ( noun == player ) {
+		print "Hablar con un", (o) player, " mism", (o) player, " ";
+		switch (Utils.get_grammatical_inflection()) {
+			FIRST_PERSON_PRESENT,
+			SECOND_PERSON_PRESENT,
+			THIRD_PERSON_PRESENT:
+				"no resulta especialmente interesante.";
+			FIRST_PERSON_PAST,
+			SECOND_PERSON_PAST,
+			THIRD_PERSON_PAST:
+				"no resultaba especialmente interesante.";
+			FIRST_PERSON_FUTURE,
+			SECOND_PERSON_FUTURE,
+			THIRD_PERSON_FUTURE:
+				"no resultará especialmente interesante.";
+		}
+	}
+	!! 2) El personaje intenta hablar con un objeto inanimado:
+	if ( noun hasnt animate ) {
+		switch (Utils.get_grammatical_inflection()) {
+			FIRST_PERSON_PRESENT,
+			SECOND_PERSON_PRESENT,
+			THIRD_PERSON_PRESENT:
+				"Sería más interesante intentar hablar con cosas que puedan
+				devolver una respuesta.";
+			FIRST_PERSON_PAST,
+			SECOND_PERSON_PAST,
+			THIRD_PERSON_PAST:
+				"Hubiese sido más interesante intentar hablar con cosas que
+				pudiesen devolver una respuesta.";
+			FIRST_PERSON_FUTURE,
+			SECOND_PERSON_FUTURE,
+			THIRD_PERSON_FUTURE:
+				"Será más interesante intentar hablar con cosas que puedan
+				devolver una respuesta.";
+		}
+	}
+	!! 3) El personaje intenta hablar con un objeto animado:
+	switch (Utils.get_grammatical_inflection()) {
+		FIRST_PERSON_PRESENT:
+		SECOND_PERSON_PRESENT,
+		THIRD_PERSON_PRESENT:
+			print (The) noun, " no parecen", (n) noun;
+		FIRST_PERSON_PAST,
+		SECOND_PERSON_PAST,
+		THIRD_PERSON_PAST:
+			print (The) noun, " no parecía", (n) noun;
+		FIRST_PERSON_FUTURE,
+		SECOND_PERSON_FUTURE,
+		THIRD_PERSON_FUTURE:
+			print (The) noun, " no parecerá", (n) noun;
+	}
+	" interesad", (o) noun, " en hablar ", (contigo) player, ".";
+];
+
+
+!!==============================================================================
+!!
+!!	8)	Definición de atributos, clases y objetos
+!!
+!!------------------------------------------------------------------------------
+
+Include ">kickstart_classes.inf";
+Include ">kickstart_utils.inf";
+
+Include ">marcela_objects.inf";

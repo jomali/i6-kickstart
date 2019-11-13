@@ -2,40 +2,41 @@
 
 !!==============================================================================
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA
+!!	EL BARÓN
 !!	Personalizaciones sobre los mensajes de la librería
 !!
 !!==============================================================================
 !!
-!!	Archivo:		marcela_langLM.inf
-!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Archivo:		baron_langLM.inf
+!!	Autor(es):		Victor Gijsbers
+!!					J. Francisco Martín <jfm.lisaso@gmail.com>
 !!	Idioma:			ES (Español)
 !!	Sistema:		Inform-INFSP 6
 !!	Plataforma:		Máquina-Z/Glulx
-!!	Versión:		1.0
-!!	Fecha:			2018/11/18
+!!	Versión:		0.0
+!!	Fecha:			2019/02/XX
 !!
 !!------------------------------------------------------------------------------
 !!
-!!	Este archivo forma parte de la ficción interactiva
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA.
+!!	Este archivo forma parte de la ficción interactiva EL BARÓN.
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA es software libre: usted puede
-!!	redistribuirlo y/o modificarlo bajo los términos de la Licencia
-!!	Pública General GNU publicada por la Fundación para el Software
-!!	Libre, ya sea la versión 3 de la Licencia, o (a su elección)
-!!	cualquier versión posterior.
+!!	EL BARÓN es software libre: usted puede redistribuirlo y/o
+!!	modificarlo bajo los términos de la Licencia Pública General
+!!	GNU publicada por la Fundación para el Software Libre, ya
+!!	sea la versión 3 de la Licencia, o (a su elección) cualquier
+!!	versión posterior.
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA se distribuye con la esperanza de
-!!	que sea útil, pero SIN GARANTÍA ALGUNA; ni siquiera la garantía
-!!	implícita MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
-!!	Consulte los detalles de la Licencia Pública General GNU para más
-!!	información.
+!!	EL BARÓN se distribuye con la esperanza de que sea útil,
+!!	pero SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
+!!	MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU
+!!	para más información.
 !!
-!!	Debería haber recibido una copia de la Licencia Pública General GNU
-!!	junto a HISTORIA DE GRISÓSTOMO Y MARCELA. En caso contrario,
-!!	consulte <http://www.gnu.org/licenses/>.
+!!	Debería haber recibido una copia de la Licencia Pública
+!!	General GNU junto a EL BARÓN. En caso contrario, consulte
+!!	<http://www.gnu.org/licenses/>.
 !!
+!!	Copyright (c) 2004, Victor Gijsbers
 !!	Copyright (c) 2018, J. Francisco Martín
 !!
 !!------------------------------------------------------------------------------
@@ -93,10 +94,6 @@ Object	LibraryMessages
 		print_ret (parser) "Para iniciar una conversación, usa simplemente la
 		orden HABLA (a/con) PERSONAJE.";
 
-	Attack: !! XXX - Mensaje personalizado del narrador
-		"No tenía intención de iniciar una pelea sin motivo contra aquella
-		gente.";
-
 	CommandsOff:
 		switch (lm_n) {
 			1:	print_ret (parser) "Grabación de órdenes finalizada.";
@@ -117,7 +114,7 @@ Object	LibraryMessages
 
 	CommandsRead:
 		switch (lm_n) {
-			1:	print_ret (parser) "Reejecutando órdenes...";
+			1:	print_ret (parser) "Reejecutando órdenes…";
 			#Ifdef TARGET_GLULX;
 			2:	print_ret (parser) "Las órdenes ya están siendo relanzadas.";
 			3:	print_ret (parser) "Fallo en la reejecución de órdenes:
@@ -127,17 +124,21 @@ Object	LibraryMessages
 			#Endif; ! TARGET_
 		}
 
-	Eat: !! XXX - Mensaje personalizado del narrador
-		switch (lm_n) {
-			1: "Aquello simplemente era incomestible.";
-			2: "Se comió ", (the) lm_o, ".";
-		}
-
 !!	FullScore: ! TODO - Mensaje del parser
 
-	Jump: !! XXX - Mensaje personalizado del narrador
-		"Un caballero andante no era realmente un caballero sin su armadura,
-		pero el precio eran ciertos límites en la libertad de movimiento.";
+	ListMiscellany:
+		!! Los siguientes mensajes se muestran como aclaraciones cuando se está
+		!! listando el inventario del usuario, o los objetos que hay en una
+		!! localidad. Junto a cada mensaje se comenta qué condiciones deben
+		!! darse en ese objeto para que se muestre ese mensaje aclaratorio.
+		switch (lm_n) {
+			8:	!! El objeto tiene 'light' y 'worn'
+				print " (alumbrando y puest", (o) lm_o;
+				return true;
+			10:	!! El objeto no tiene 'light' pero sí 'worn'
+				print " (puest", (o) lm_o;
+				return true;
+		}
 
 	LMode1:
 		!! La acción LMode1 se genera ante el comando BREVE. La librería
@@ -264,14 +265,50 @@ Object	LibraryMessages
 				!! coma, ej: PEPE ZAFDSRGG, SALTA.
 				print_ret (parser) "Para iniciar una conversación, intenta
 				órdenes del tipo: PERSONAJE, HOLA.";
+			45:
+				!! El usuario ha nombrado un PNJ ambiguo (hay más de noun con
+				!! el mismo name cerca). El parser le pide aclaración. Este
+				!! mensaje es la primera parte de la pregunta, el resto lo pone
+				!! el parser (que es la lista de PNJs entre los que duda).
+				!! Debemos poner a 1 la variable PreguntaCualExactamente cuando
+				!! se generan este tipo de preguntas aclaratorias.
+				previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+				print (string) TEXT_STYLE_PARSER_PREFIX;
+				print "[¿Quién concretamente: ";
+				PreguntaCualExactamente=1;
+				ImprimirListaDudosos("o");
+				print "?";
+				print (string) TEXT_STYLE_PARSER_SUFIX;
+				Utils.set_text_style(previous_style);
+				new_line;
+				return true;
+			46:
+				!! El usuario ha nombrado un objeto ambiguo (hay más de objeto
+				!! con el mismo nombre cerca). El parser le pide aclaración.
+				!! Este mensaje es la primera parte de la pregunta, el resto lo
+				!! pone el parser (que es la lista de objetos entre los que
+				!! duda). Debemos poner a 1 la variable PreguntaCualExactamente
+				!! cuando se generan este tipo de preguntas aclaratorias.
+				previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
+				print (string) TEXT_STYLE_PARSER_PREFIX;
+				print "¿Cuál concretamente: ";
+				PreguntaCualExactamente=1;
+				ImprimirListaDudosos("o");
+				print "?";
+				print (string) TEXT_STYLE_PARSER_SUFIX;
+				Utils.set_text_style(previous_style);
+				new_line;
+				return true;
+
 			47:
 				!! El usuario ha respondido "TODOS" o "AMBOS" a una pregunta
 				!! aclaratoria como la anterior, pero el verbo no admite
 				!! objetos múltiples.
-				print (parser) "Desafortunadamente sólo puedes referirte a un
+				print (parser) "Sólo puedes referirte a un
 				objeto en este caso. ¿Cuál exactamente?";
 				new_line;
 				PreguntaCualExactamente=1;
+				return true;
 			48:
 				!! El usuario ha escrito una frase u orden a NPC incompleta,
 				!! como BESA (verbo aplicado sobre NPCs normalmente). El parser
@@ -315,7 +352,7 @@ Object	LibraryMessages
 			51:
 				!! El usuario ha intentado una acción con objeto múltiple
 				!! (como COGE TODO). Esta acción es convertida por el parser en
-				!! una serie de actiones COGE OBJETO1, COGE OBJETO2, etc... Si
+				!! una serie de actiones COGE OBJETO1, COGE OBJETO2, etc… Si
 				!! en la ejecución de alguna de estas actiones encuentra que la
 				!! localidad del player ha cambiado, debe abortar el proceso.
 				!! Este mensaje informa de ello al usuario.
@@ -326,18 +363,19 @@ Object	LibraryMessages
 				print_ret (parser) "Comentario guardado.";
 			55:
 				print_ret (parser) "Comentario NO guardado.";
+			56:
+				return true;
+			57:
+				return true;
 		}
 
 	NotifyOff:
 		print_ret (parser) "Notificación de puntuación desactivada.";
 
-	Pray: !! XXX - Mensaje personalizado del narrador
-		"Elevó una plegaria por el alma del desdichado difunto.";
-
 	Pronouns:
 		!! Esta acción (generada por el verbo PRONOMBRES) muestra una lista
 		!! de qué significa en ese momento para el parser cada pronombre:
-		!! -lo, -la, -los, -las...
+		!! -lo, -la, -los, -las…
 		!!
 		!!	1:	Texto introductorio.
 		!!	2:	La palabra "es".
@@ -370,6 +408,7 @@ Object	LibraryMessages
 		!! El prompt aparece justo antes de pedir una nueva línea al usuario.
 		!! Puede definirse para que sea una frase, o se genere una frase
 		!! aleatoria en cada turno, por ejemplo.
+		Tutorial.hints();
 		#Ifdef USE_VORPLE;
 		if (VorpleAppendToLM(##Prompt, lm_n)) return true;
 		#Endif; ! USE_VORPLE;
@@ -497,25 +536,22 @@ Object	LibraryMessages
 			1:
 				print_ret (parser) "La transcripción ya estaba activada.";
 			2:
-				print_ret (parser) "Iniciando transcripción...";
+				print_ret (parser) "Iniciando transcripción…";
 			3:
 				print_ret (parser) "Error al intentar iniciar la
 				transcripción.";
 		}
 
-	Sing: !! XXX - Mensaje personalizado del narrador
-		"No tenía ánimos para cantar nada en aquel momento.";
-
-	Swim: !! XXX - Mensaje personalizado del narrador
-		"Nunca supo nadar y, en cualquier caso, no podría haberlo hecho allí.";
-
-	Think: !! XXX - Mensaje personalizado del narrador
-		"No era momento para ensoñaciones.";
+	Smell: !! XXX
+		print "No hueles nada extraño";
+		if (lm_o ~= 0) {
+			print " en ";
+			Utils.spanish_nominative_pronoun(lm_o);
+		}
+		".";
 
 	VagueGo:
-		!! XXX - Mensaje personalizado del narrador
-		!! El usuario ha dicho IR sin especificar a dónde
-		"Aún no había llegado el momento de moverse de allí.";
+		print_ret (parser) "Tienes que especificar en qué dirección ir.";
 
 	Verify:
 		!!	1:	Éxito.
@@ -530,9 +566,6 @@ Object	LibraryMessages
 				intérprete muy primitivo que no sea capaz de realizar la
 				comprobación).";
 		}
-
-	Wait: !! XXX - Mensaje personalizado del narrador
-		"El tiempo pasaba...";
 
 	Yes:
 		print_ret (parser) "La instrucción @<<SÍ@>> no tiene sentido en esta

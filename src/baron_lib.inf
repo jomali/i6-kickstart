@@ -2,107 +2,145 @@
 
 !!==============================================================================
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA
+!!	EL BARÓN
 !!	Personalizaciones a la librería Inform
 !!
 !!==============================================================================
 !!
-!!	Archivo:		marcela_lib.inf
-!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Archivo:		baron_lib.inf
+!!	Autor(es):		Victor Gijsbers
+!!					J. Francisco Martín <jfm.lisaso@gmail.com>
 !!	Idioma:			ES (Español)
 !!	Sistema:		Inform-INFSP 6
 !!	Plataforma:		Máquina-Z/Glulx
-!!	Versión:		1.0
-!!	Fecha:			2018/11/18
+!!	Versión:		0.0
+!!	Fecha:			2019/02/XX
 !!
 !!------------------------------------------------------------------------------
 !!
-!!	Este archivo forma parte de la ficción interactiva
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA.
+!!	Este archivo forma parte de la ficción interactiva EL BARÓN.
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA es software libre: usted puede
-!!	redistribuirlo y/o modificarlo bajo los términos de la Licencia
-!!	Pública General GNU publicada por la Fundación para el Software
-!!	Libre, ya sea la versión 3 de la Licencia, o (a su elección)
-!!	cualquier versión posterior.
+!!	EL BARÓN es software libre: usted puede redistribuirlo y/o
+!!	modificarlo bajo los términos de la Licencia Pública General
+!!	GNU publicada por la Fundación para el Software Libre, ya
+!!	sea la versión 3 de la Licencia, o (a su elección) cualquier
+!!	versión posterior.
 !!
-!!	HISTORIA DE GRISÓSTOMO Y MARCELA se distribuye con la esperanza de
-!!	que sea útil, pero SIN GARANTÍA ALGUNA; ni siquiera la garantía
-!!	implícita MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
-!!	Consulte los detalles de la Licencia Pública General GNU para más
-!!	información.
+!!	EL BARÓN se distribuye con la esperanza de que sea útil,
+!!	pero SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
+!!	MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU
+!!	para más información.
 !!
-!!	Debería haber recibido una copia de la Licencia Pública General GNU
-!!	junto a HISTORIA DE GRISÓSTOMO Y MARCELA. En caso contrario,
-!!	consulte <http://www.gnu.org/licenses/>.
+!!	Debería haber recibido una copia de la Licencia Pública
+!!	General GNU junto a EL BARÓN. En caso contrario, consulte
+!!	<http://www.gnu.org/licenses/>.
 !!
+!!	Copyright (c) 2004, Victor Gijsbers
 !!	Copyright (c) 2018, J. Francisco Martín
 !!
 !!------------------------------------------------------------------------------
 !!
 !!	TABLA DE CONTENIDOS
 !!
-!!	<>	Banner()
-!!		-	PrintStoryTitle()
-!!		-	PrintHeadline()
-!!		-	PrintVersionNumber()
-!!		-	PrintSerialNumber()
-!!	<>	DrawStatusLine()
-!!	<>	ExamineSub()
-!!	<>	GetGNAOfObject()
-!!	<>	GetActionVerb()
-!!	<>	LanguageDirection() / Redefinición de direcciones
-!!	<>	LMode1Sub()
-!!	<>	LMode2Sub()
-!!	<>	LMode3Sub()
-!!	<>	LookSub()
-!!	<>	ParseNoun()
-!!	<>	PSN__()
-!!	<>	VersionSub()
+!!	1) Atributos adicionales
+!!		<>	described
+!!		<>	remarkable
+!!
+!!	2)	Redefiniciones sobre la librería Inform
+!!		<>	Banner()
+!!			-	PrintSerialNumber()
+!!			-	PrintVersionNumber()
+!!		<>	DrawStatusLine()
+!!		<>	ExamineSub()
+!!		<>	GetGNAOfObject()
+!!		<>	LanguageDirection() / Redefinición de direcciones
+!!		<>	LMode1Sub()
+!!		<>	LMode2Sub()
+!!		<>	LMode3Sub()
+!!		<>	LookSub()
+!!		<>	ParseNoun()
+!!		<>	PSN__()
+!!		<>	PRT__()
+!!		<>	VersionSub()
 !!
 !!------------------------------------------------------------------------------
+
+!!==============================================================================
+!!
+!!	1) Atributos adicionales
+!!
+!!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
+!! Permite marcar objetos que ya han sido descritos al usuario —es análogo al
+!! atributo 'visited' de las localidades—. La lógica encargada de marcar los
+!! objetos al ser examinados por primera vez se encuentra en la rutina
+!! ExamineSub().
+!!------------------------------------------------------------------------------
+Attribute described;
+
+!!------------------------------------------------------------------------------
+!! Permite marcar objetos como destacados dentro de la historia (por si mismo,
+!! marcar un objeto como destacado no tiene ningún efecto práctico, pero puede
+!! utilizarse en conjunto con otros sistemas como el de palabras destacadas,
+!! por ejemplo).
+!!------------------------------------------------------------------------------
+Attribute remarkable;
 
 
 !!==============================================================================
+!!
+!!	2)	Redefiniciones sobre la librería Inform
+!!
+!!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
 !! Conjunto de rutinas para imprimir los créditos de la aplicación en
-!! castellano. Lista de rutinas incluidas: Banner(), PrintHeadline(),
-!! PrintSerialNumber(), PrintStoryTitle() y PrintVersionNumber().
+!! castellano.
 !!
 !!	@override verblibm.h
-!!	@version 2.0
+!!	@version 2019/06/17
 !!------------------------------------------------------------------------------
 [ Banner
 	previous_style;
-	!! Imprime el título:
 	if (Story ~= 0) {
-		previous_style = Util.set_text_style(TEXT_STYLE_HEADER);
+		previous_style = Utils.set_text_style(TEXT_STYLE_HEADER);
 		print (string) Story;
-		Util.set_text_style(previous_style);
+		Utils.set_text_style(previous_style);
 		new_line;
 	}
-	!! Imprime el encabezado:
 	if (Headline ~= 0) {
 		print (string) Headline;
 		new_line;
 	}
+	#Ifdef DEBUG;
+	print "BETA ";
+	#Ifnot;
+	#Ifdef VERSION_DESKTOP;
 	print "Versión ";
+	#Ifnot; ! VERSION_WEB_MOBILE;
+	print "v.";
+	#Endif; ! VERSION_
+	#Endif; ! DEBUG;
 	PrintVersionNumber();
-	#Ifndef VERSION_DESKTOP;
+	#Ifdef VERSION_WEB_MOBILE;
 	if (isVorpleSupported()) print " WEB";
 	else print " LITE";
-	#Endif; ! VERSION_DESKTOP;
+	#Endif; ! VERSION_WEB_MOBILE;
 	print " / Núm. de serie ";
 	PrintSerialNumber();
-	print " / Creado con Inform "; inversion;
+	print " / Creado con Inform ";
+	inversion;
 	#Ifdef DEBUG;
 	print " ";
-	#Endif; ! DEBUG;
 	#Ifdef STRICT_MODE;
 	print "S";
 	#Endif; ! STRICT_MODE
 	#Ifdef INFIX;
 	print "X";
 	#Endif; ! INFIX
+	#Endif; ! DEBUG;
 	new_line;;
 ];
 
@@ -129,10 +167,9 @@
 	#Endif;	! TARGET_
 ];
 
-
-!!==============================================================================
+!!------------------------------------------------------------------------------
 !! Elimina la barra de estado (crea una barra de estado sin altura). Sólo en
-!! Máquina-Z, en Glulx se utiliza la configuración de ventanas de GWindows.
+!! Máquina-Z. En Glulx se utiliza la configuración de ventanas de GWindows.
 !!
 !!	@override parserm.h
 !!	@version 1.0
@@ -142,8 +179,7 @@
 	MainWindow();
 ];
 
-
-!!==============================================================================
+!!------------------------------------------------------------------------------
 !! Rutina para obtener la descripción de un objeto. Es idéntica a la rutina
 !! original implementada en 'verblibm.h' salvo por un detalle: al examinar un
 !! objeto por primera vez se le asigna el nuevo atributo 'described'.
@@ -152,7 +188,6 @@
 !!	@override verblibm.h
 !!	@version 1.0
 !!------------------------------------------------------------------------------
-Attribute described; ! Indica si un objeto ha sido descrito al jugador
 [ ExamineSub
 	i;
 	if (location == thedark) return L__M(##Examine, 1);
@@ -169,8 +204,7 @@ Attribute described; ! Indica si un objeto ha sido descrito al jugador
 	if (AfterRoutines() == 1) rtrue;
 ];
 
-
-!!==============================================================================
+!!------------------------------------------------------------------------------
 !! Determina el código GNA ('gender-number-animation') del nombre corto del
 !! objeto 'obj' pasado como parámetro. El código GNA es un número entero entre
 !! 0 y 11:
@@ -236,127 +270,12 @@ Attribute described; ! Indica si un objeto ha sido descrito al jugador
     return result;
 ];
 
-
-!!==============================================================================
-!! Retorna el verbo que se corresponde a la acción dada como parámetro.
-!!
-!!	@param {Object} x - Constante con una acción
-!!	@returns {string} Una palabra que se corresponde con la acción 'x'
-!!	@version 1.0
 !!------------------------------------------------------------------------------
-!! [ GetActionVerb x;
-!! 	switch (x) {
-!! 		!! GROUP 2 ACTIONS: Usually work, given the right circumstances.
-!! 		##Close:		return "Cerrar";
-!! 		##Disrobe:		return "Desvestir";
-!! 		##Drop:			return "Dejar";
-!! 		##Eat:			return "Comer";
-!! 		##Empty:		return "Vaciar";
-!! 		!##EmptyT
-!! 		##Enter:		return "Entrar";
-!! 		##Examine:		return "Examinar";
-!! 		##Exit:			return "Salir";
-!! 		##GetOff:		return "Salir";
-!! 		##Give:			return "Dar";
-!! 		##Go:			return "Ir";
-!! 		##GoIn:			return "Entrar";
-!! 		##Insert:		return "Meter";
-!! 		##Inv:			return "Inventario";
-!! 		##InvTall:		return "Inventario (lista)";
-!! 		##InvWide:		return "Inventario (descripción)";
-!! 		##Lock:			return "Bloquear";
-!! 		##Look:			return "Mirar";
-!! 		##Open:			return "Abrir";
-!! 		##Order:		return "Ordenar";
-!! 		##PutOn:		return "Poner encima";
-!! 		##Remove:		return "Quitar";
-!! 		##Search:		return "Buscar";
-!! 		##Show:			return "Enseñar";
-!! 		##SwitchOff:	return "Apagar";
-!! 		##SwitchOn:		return "Encender";
-!! 		##Take:			return "Coger";
-!! 		!##Transfer
-!! 		##Unlock:		return "Desbloquear";
-!! 		!##VagueGo
-!! 		##Wear:			return "Vestir";
-!! 		!! GROUP 3 ACTIONS: Output a message and stop at the "before" stage.
-!! 		##Answer:		return "Responder";
-!! 		##Ask:			return "Preguntar";
-!! 		##AskFor:		return "Preguntar por";
-!! 		##Attack:		return "Atacar";
-!! 		##Blow:			return "Soplar";
-!! 		##Burn:			return "Quemar";
-!! 		##Buy:			return "Comprar";
-!! 		##Climb:		return "Escalar";
-!! 		##Consult:		return "Consultar";
-!! 		##Cut:			return "Cortar";
-!! 		##Dig:			return "Excavar";
-!! 		##Drink:		return "Beber";
-!! 		##Fill:			return "Llenar";
-!! 		##Jump:			return "Saltar";
-!! 		##JumpOver:		return "Saltar";
-!! 		##Kiss:			return "Besar";
-!! 		!##LetGo:
-!! 		##Listen:		return "Escuchar";
-!! 		##LookUnder:	return "Mirar debajo";
-!! 		##Mild:			return "Insultar";
-!! 		##No:			return "No";
-!! 		##Pray:			return "Rezar";
-!! 		##Pull:			return "Tirar";
-!! 		##Push:			return "Empujar";
-!! 		##PushDir:		return "Empujar hacia";
-!! 		##Receive:		return "Recibir";
-!! 		##Rub:			return "Frotar";
-!! 		##Set:			return "Establecer";
-!! 		##SetTo:		return "Establecer a";
-!! 		##Sing:			return "Cantar";
-!! 		##Sleep:		return "Dormir";
-!! 		##Smell:		return "Oler";
-!! 		##Sorry:		return "Disculpar";
-!! 		##Squeeze:		return "Agitar";
-!! 		##Strong:		return "Blasfemar";
-!! 		##Swim:			return "Nadar";
-!! 		##Swing:		return "Columpiar";
-!! 		##Taste:		return "Saborear";
-!! 		##Tell:			return "Decir";
-!! 		##Think:		return "Pensar";
-!! 		##ThrowAt:		return "Lanzar a";
-!! 		##Tie:			return "Atar";
-!! 		##Touch:		return "Tocar";
-!! 		##Turn:			return "Girar";
-!! 		##Wait:			return "Esperar";
-!! 		##Wake:			return "Despertar";
-!! 		##WakeOther:	return "Despertar";
-!! 		##Wave:			return "Gesticular";
-!! 		##WaveHands:	return "Gesticular con las manos";
-!! 		##Yes:			return "Si";
-!! 		!! GRAMÁTICA ESPAÑOLA EXTENDIDA:
-!! 		##Dance:		return "Bailar";
-!! 		##GoDown:		return "Descender";
-!! 		##GoUp:			return "Ascender";
-!! 		##KnockOn:		return "Llamar";
-!! 		##Masturbate:	return "Masturbarse";
-!! 		##Read:			return "Leer";
-!! 		##Shout:		return "Gritar";
-!! 		##Sit:			return "Sentarse";
-!! 		##SleepWith:	return "Follar";
-!! 		##StandUp:		return "Levantarse";
-!! 		##Untie:		return "Desatar";
-!! 		##Use:			return "Usar";
-!! 		##Write:		return "Escribir";
-!! 		##Xyzzy:		return "Xyzzy";
-!! 		!! CUSTOM ACTIONS:
-!! 		##TalkTo:		return "Hablar";
-!! 	}
-!! ];
-
-
-!!==============================================================================
-!! Redefinición de los 8 puntos cardinales ---norte, sur, este, oeste,
-!! nordeste, noroeste, sudeste, sudoeste--- y las direcciones 'arriba' y
-!! 'abajo' (se mantienen las definiciones 'interior' y 'exterior' por defecto
-!! de la 'Spanish.h'), para eliminar los nombres 'cielo' 'techo', 'piso' y
-!! 'suelo', de forma que puedan ser utilizados por otros objetos del relato.
+!! Redefinición de los 8 puntos cardinales —norte, sur, este, oeste, nordeste,
+!! noroeste, sudeste, sudoeste— y las direcciones 'arriba' y 'abajo' (se
+!! mantienen las definiciones 'interior' y 'exterior' por defecto de
+!! 'Spanish.h'), para eliminar los nombres 'cielo' 'techo', 'piso' y 'suelo',
+!! de forma que puedan ser utilizados por otros objetos del relato.
 !!
 !! Se abre la posibilidad de añadir aquí direcciones nuevas, por ejemplo:
 !! 'adelante' y 'atrás'. Para ello se redefine también la runtina
@@ -370,48 +289,71 @@ Attribute described; ! Indica si un objeto ha sido descrito al jugador
 !!	@override Spanish.h
 !!	@version 1.0
 !!------------------------------------------------------------------------------
-
 CompassDirection n_obj "norte" compass
- with	name 'n//' 'norte', door_dir n_to;
+ with	name 'n//' 'norte',
+		door_dir n_to,
+;
 
 CompassDirection s_obj "sur" compass
- with	name 's//' 'sur', door_dir s_to;
+ with	name 's//' 'sur',
+		door_dir s_to,
+;
 
 CompassDirection e_obj "este" compass
- with	name 'e//' 'este', door_dir e_to;
+ with	name 'e//' 'este',
+		door_dir e_to,
+;
 
 CompassDirection w_obj "oeste" compass
- with	name 'w//' 'o//' 'oeste', door_dir w_to;
+ with	name 'w//' 'o//' 'oeste',
+		door_dir w_to,
+;
 
 CompassDirection ne_obj "nordeste" compass
- with	name 'ne' 'nordeste' 'noreste', door_dir ne_to;
+ with	name 'ne' 'nordeste' 'noreste',
+		door_dir ne_to,
+;
 
 CompassDirection nw_obj "noroeste" compass
- with	name 'no' 'nw' 'noroeste', door_dir nw_to;
+ with	name 'no' 'nw' 'noroeste',
+		door_dir nw_to,
+;
 
 CompassDirection se_obj "sudeste" compass
- with	name 'se' 'sureste' 'sudeste', door_dir se_to;
+ with	name 'se' 'sureste' 'sudeste',
+		door_dir se_to,
+;
 
 CompassDirection sw_obj "sudoeste" compass
- with	name 'so' 'sw' 'suroeste' 'sudoeste', door_dir sw_to;
+ with	name 'so' 'sw' 'suroeste' 'sudoeste',
+		door_dir sw_to,
+;
 
 CompassDirection u_obj "arriba" compass
- with	name 'u//' 'arriba' 'ar' 'r//' 'sube', door_dir u_to,
- has	proper;
+ has	proper,
+ with	name 'u//' 'arriba' 'ar' 'r//' 'sube',
+		door_dir u_to,
+;
 
 CompassDirection d_obj "abajo" compass
- with	name 'd//' 'abajo' 'ab' 'baja', door_dir d_to,
- has	proper;
+ has	proper,
+ with	name 'd//' 'abajo' 'ab' 'baja',
+		door_dir d_to,
+;
 
-!! Property b_to;
-!! CompassDirection b_obj "atrás" compass
-!!  with	name 'b//' 'atras', door_dir b_to,
-!!  has	proper;
-!!
-!! Property f_to;
-!! CompassDirection f_obj "adelante" compass
-!!  with	name 'f//' 'adelante', door_dir f_to,
-!!  has	proper;
+Property b_to;
+CompassDirection b_obj "atrás" compass
+ has	proper,
+ with	name 'b//' 'atras',
+		door_dir b_to,
+;
+
+Property f_to;
+CompassDirection f_obj "adelante" compass
+ has	proper,
+ with	name 'f//' 'adelante',
+		door_dir f_to,
+;
 
 [ LanguageDirection dir;
 	switch (dir) {
@@ -427,14 +369,13 @@ CompassDirection d_obj "abajo" compass
 		d_to:	print "abajo";
 		in_to:	print "dentro";
 		out_to:	print "fuera";
-		!! b_to:	print "atrás";
-		!! f_to:	print "adelante";
+		b_to:	print "atrás";
+		f_to:	print "adelante";
 		default: return RunTimeError(9, dir);
 	}
 ];
 
-
-!!==============================================================================
+!!------------------------------------------------------------------------------
 !! Redefinición de los 'lookmode': Breve, Largo y Superbreve.
 !!
 !!	@override verblibm.h
@@ -444,15 +385,18 @@ CompassDirection d_obj "abajo" compass
 [ LMode2Sub; lookmode = 2; L__M( ##LMode2 ); ];	! Largo (ahora por defecto)
 [ LMode3Sub; lookmode = 3; L__M( ##LMode3 ); ];	! Superbreve
 
-
-!!==============================================================================
-!! Redefinición de la rutina 'LookSub' para evitar que se imprima el nombre de
-!! la localidad actual antes de su descripción.
+!!------------------------------------------------------------------------------
+!! Redefinición de la rutina 'LookSub'. Imprime el nombre de la localidad
+!! actual sólo al entrar en ella, en mayúsculas y evitando que se genere un
+!! hipervínculo sobre él.
 !!
 !!	@override verblibm.h
-!!	@version 1.0
+!!	@dependency arrays.h
+!!	@version 2019/06/22
 !!------------------------------------------------------------------------------
-[ LookSub allow_abbrev  visibility_levels i j k nl_flag;
+Global _last_location = 0;
+[ LookSub allow_abbrev
+	i j k nl_flag previous_style visibility_levels;
 	if (parent(player) == 0) return RunTimeError(10);
 
 	.MovedByInitial;
@@ -466,31 +410,46 @@ CompassDirection d_obj "abajo" compass
 		}
 	}
 
-	!! ! Printing the top line: e.g.
-	!! ! Octagonal Room (on the table) (as Frodo)
-	!! new_line;
-	!! #Ifdef TARGET_ZCODE;
-	!! style bold;
-	!! #Ifnot; ! TARGET_GLULX;
-	!! glk($0086, 4); ! set subheader style
-	!! #Endif; ! TARGET_
-	!! if (visibility_levels == 0) print (name) thedark;
-	!! else {
-	!! 	if (visibility_ceiling ~= location) print (The) visibility_ceiling;
-	!! 	else print (name) visibility_ceiling;
-	!! }
-	!! #Ifdef TARGET_ZCODE;
-	!! style roman;
-	!! #Ifnot; ! TARGET_GLULX;
-	!! glk($0086, 0); ! set normal style
-	!! #Endif; ! TARGET_
-    !!
-	!! for (j=1,i=parent(player) : j<visibility_levels : j++,i=parent(i))
-	!! 	if (i has supporter) L__M(##Look, 1, i);
-	!! 	else                 L__M(##Look, 2, i);
-    !!
-	!! if (print_player_flag == 1) L__M(##Look, 3, player);
-	!! new_line;
+	if (_last_location ~= real_location) {
+		_last_location = real_location;
+		!! Elimina todos los hipervínculos impresos previamente:
+		#Ifdef USE_VORPLE;
+		VorpleExecuteJavaScriptCommand(BuildCommand("
+			ifjs.clearHyperlinks();
+		"));
+		#Endif; ! USE_VORPLE;
+		!! Establece los estilos de texto:
+		#Ifdef TARGET_ZCODE;
+		style bold;
+		#Ifnot; ! TARGET_GLULX;
+		#Ifdef VERSION_WEB_MOBILE;
+		VorpleStyle(STYLE_DARK_GRAY_BACKGROUND);
+		#Endif; ! VERSION_WEB_MOBILE;
+		previous_style = Utils.set_text_style(TEXT_STYLE_IMPORTANT);
+		#Endif; ! TARGET_
+		!! Imprime el nombre de la localidad actual:
+		if (visibility_levels == 0) {
+			PrintToBuffer(utility_array_a, INPUT_BUFFER_LEN, thedark);
+			PrintCharacterArray(utility_array_a, 1);
+		} else {
+			if (visibility_ceiling ~= location) {
+				print (El_) visibility_ceiling, " ";
+			}
+			PrintToBuffer(utility_array_a, INPUT_BUFFER_LEN,
+				visibility_ceiling);
+			PrintCharacterArray(utility_array_a, 1);
+		}
+		new_line;
+		!! Reestablece los estilos de texto anteriores:
+		#Ifdef TARGET_ZCODE;
+		style roman;
+		#Ifnot; ! TARGET_GLULX;
+		Utils.set_text_style(previous_style);
+		#Ifdef VERSION_WEB_MOBILE;
+		VorpleEndStyle();
+		#Endif; ! VERSION_WEB_MOBILE;
+		#Endif; ! TARGET_
+	}
 
 	! The room description (if visible)
 	if (lookmode < 3 && visibility_ceiling == location) {
@@ -521,11 +480,11 @@ CompassDirection d_obj "abajo" compass
 	LookRoutine();
 	ScoreArrival();
 	action = ##Look;
+
 	if (AfterRoutines() == 1) rtrue;
 ];
 
-
-!!==============================================================================
+!!------------------------------------------------------------------------------
 !! La rutina ParseNoun se ocupa de ignorar "de" cuando aparece entre dos
 !! palabras reconocidas como names de un mismo objeto. Así, si un objeto tiene
 !! en su campo "name" los valores "caja" "madera" "caoba" ParseNoun aceptará
@@ -544,7 +503,7 @@ CompassDirection d_obj "abajo" compass
 !! valor "caja" en sus campos "name" (name, name_m, name_f, name_mp y name_fp)
 !! y los valores "madera" y "caoba" en el campo "adjectives", ParseNoun
 !! aceptaría las cadenas "caja", "caja de madera", "caja de madera de caoba",
-!! "madera", "caoba",... para referirse al objeto. Con la rutina modificada se
+!! "madera", "caoba",… para referirse al objeto. Con la rutina modificada se
 !! permite hacer parseado estricto de forma que las cadenas "madera" y "caoba"
 !! no sean cadenas válidas. Es decir, de manera que sea precisa la existencia
 !! de al menos una coincidencia con los valores de los campos "name" del
@@ -594,9 +553,9 @@ CompassDirection d_obj "abajo" compass
 			n++;		! la contamos
 			m++;
 			nf++;
-			n=n+dudas;	! añadimos todos los "de" "la"... que estaban sin contar
+			n=n+dudas;	! añadimos todos los "de" "la"… que estaban sin contar
 			dudas=0;	! y resetamos el contador de "de"s
-!			print " --> es ahora femenino...." ; !infsp debug
+!			print " --> es ahora femenino…." ; !infsp debug
 			continue;	! volvemos al while
 		}
 		if (WordInProperty (p, obj, name_mp))
@@ -607,7 +566,7 @@ CompassDirection d_obj "abajo" compass
 			n++;		! la contamos
 			m++;
 			nmp++;
-			n=n+dudas;	! añadimos todos los "de" "la"... que estaban sin contar
+			n=n+dudas;	! añadimos todos los "de" "la"… que estaban sin contar
 			dudas=0;	! y resetamos el contador de "de"s
 			continue;	! volvemos al while
 		}
@@ -619,7 +578,7 @@ CompassDirection d_obj "abajo" compass
 			n++;		! la contamos
 			m++;
 			nfp++;
-			n=n+dudas;	! añadimos todos los "de" "la"... que estaban sin contar
+			n=n+dudas;	! añadimos todos los "de" "la"… que estaban sin contar
 			dudas=0;	! y resetamos el contador de "de"s
 			continue;	! volvemos al while
 		}
@@ -634,9 +593,9 @@ CompassDirection d_obj "abajo" compass
 			n++;		! la contamos
 			m++;
 			nm++;
-			n=n+dudas;	! añadimos todos los "de" "la"... que estaban sin contar
+			n=n+dudas;	! añadimos todos los "de" "la"… que estaban sin contar
 			dudas=0;	! y resetamos el contador de "de"s
-!			print " --> es ahora masculino...." ; !infsp debug
+!			print " --> es ahora masculino…." ; !infsp debug
 			continue;	! volvemos al while
 		}
 		if (WordInProperty(p, obj, adjectives))
@@ -644,9 +603,9 @@ CompassDirection d_obj "abajo" compass
 			if (p) dict_flags_of_noun = (p->#dict_par1) & $$01110100;
 			n++;		! la contamos
 			a++;
-			n=n+dudas;	! añadimos todos los "de" "la"... que estaban sin contar
+			n=n+dudas;	! añadimos todos los "de" "la"… que estaban sin contar
 			dudas = 0;	! y resetamos el contador de "de"s
-!			print (the) obj," --> adjetivo detectado....^" ; !infsp debug
+!			print (the) obj," --> adjetivo detectado….^" ; !infsp debug
 			continue;	! volvemos al while
 		}
 
@@ -691,15 +650,14 @@ CompassDirection d_obj "abajo" compass
 	return n; ! Se retorna número de palabras reconocidas
 ];
 
-
-!!==============================================================================
-!! Rutina para imprimir el nombre corto de un objeto. Además, crea un
-!! hipervínculo relacionado con el objeto y, si el objeto tiene el atributo
-!! 'remarkable' utiliza un estilo resaltado para imprimir el nombre.
+!!------------------------------------------------------------------------------
+!! Rutina para imprimir el nombre corto de un objeto (Print Short Name). En
+!! conjunto con la rutina 'PRT__()' (Print Rich Text) puede crear además un
+!! hipervínculo asociado al objeto y utilizar un estilo de texto personalizado.
 !!
 !!	@returns {boolean} Verdadero
 !!	@override parserm.h
-!!	@version 2.0
+!!	@version 2019/09/17
 !!------------------------------------------------------------------------------
 [ PSN__ obj;
 	if (obj == 0) { print (string) NOTHING__TX; rtrue; }
@@ -708,15 +666,111 @@ CompassDirection d_obj "abajo" compass
 		String:		print "<string ~", (string) obj, "~>"; rtrue;
 		nothing:	print "<illegal object number ", obj, ">"; rtrue;
 	}
-	return Util.extended_print(obj, 0, -1);
+	if (obj == player) { print (string) YOURSELF__TX; rtrue; }
+	#Ifdef LanguagePrintShortName;
+	if (LanguagePrintShortName(obj)) rtrue;
+	#Endif; ! LanguagePrintShortName;
+	!! Se relega a la rutina 'short_name_indef()' del objeto las tareas de
+	!! creación del hipervínculo y de selección de estilo (si es oportuno):
+	if (indef_mode && obj.&short_name_indef ~= 0
+		&& PrintOrRun(obj, short_name_indef, 1) ~= 0) {
+		return true;
+	}
+	!! Se relega a la rutina 'short_name()' del objeto las tareas de
+	!! creación del hipervínculo y de selección de estilo (si es oportuno):
+	if (obj.&short_name ~= 0 && PrintOrRun(obj, short_name, 1) ~= 0) {
+		return true;
+	}
+	!! Algunos mensajes de error del analizador de comandos pueden pasar
+	!! objetos "VerboIrregular" que deben imprimirse en esta estapa para evitar
+	!! que PRT__() pueda introducir algún estilo de texto destacado:
+	if (obj ofclass VerboIrregular) {
+		print (object) obj;
+		return true;
+	}
+	!! 'PRT__()' se encarga de imprimir el nombre del objeto, crear el
+	!! hipervínculo (si es oportuno) y seleccionar el estilo de texto adecuado:
+	PRT__(obj);
+	return true;
 ];
 
+!!------------------------------------------------------------------------------
+!! Rutina para imprimir texto "rico" o formateado (Print Rich Text). Imprime
+!! una cadena de caracteres o el nombre de un objeto asociándole además un
+!! hipervínculo y seleccionando un estilo de texto adecuado.
+!!
+!!	@param {string|Object} rtxt - Cadena de caracteres u objeto a imprimir
+!!	@param {string} [alternative=0] - Permite especificar un texto alternativo
+!!		a imprimir en lugar de 'rtxt'. La rutina sigue utilizando 'rtxt', no
+!!		obstante, para determinar automáticamente el estilo de texto destacado
+!!		—cuando el parámetro 'style' es 0— y para asociar a él el hipervínculo
+!!	@param {integer} [type=0] - Código numérico forzando un tipo de objeto,
+!!		independientemente de la definición de 'rtxt': 0, objetos genéricos; 1,
+!!		objetos destacados; 2, puntos cardinales y otras direcciones de
+!!		desplazamiento; 3, elecciones
+!!	@returns {boolean} Verdadero
+!!	@dependency baron.inf
+!!	@dependency baron_utils.inf
+!!	@dependency hyperlinks.h
+!!	@dependency textStyles.h
+!!	@version 2019/09/14
+!!------------------------------------------------------------------------------
+[ PRT__ rtxt alternative object_type
+	style_code previous_style hyperlinks_status;
+	!! Establece el tipo de objeto:
+	if (object_type == 0 && metaclass(rtxt) == Object) {
+		if (rtxt ofclass ChoiceSetItem) {
+			object_type = CHOICE_OBJECT;
+		} else if (rtxt ofclass CompassDirection or AdjacentRoom) {
+			object_type = DIRECTION_OBJECT;
+		} else if ((rtxt has remarkable)
+			|| (~~(rtxt has concealed or scenery))) {
+			object_type = REMARKABLE_OBJECT;
+		} else {
+			object_type = OTHER_OBJECT;
+		}
+	} else if (object_type == 0) {
+		object_type = OTHER_OBJECT;
+	}
 
-!!==============================================================================
+	!! Establece el estilo de texto destacado:
+	style_code = Utils.get_highlight_style(object_type);
+	previous_style = Utils.set_text_style(style_code);
+
+	!! Determina estado de los hipervínculos y crea uno si están activados:
+	hyperlinks_status = Utils.get_hyperlinks_status(object_type);
+	if (metaclass(alternative) == String) rtxt = alternative;
+	#Ifdef USE_HYPERLINKS;
+	if (hyperlinks_status) {
+		Hyperlink(rtxt);
+	} else {
+		if (metaclass(rtxt) == String) print (string) rtxt;
+		else print (object) rtxt;
+	}
+	#Ifnot;
+	#Ifdef USE_VORPLE;
+	if (hyperlinks_status) {
+		Utils.create_vorple_hyperlink(rtxt);
+	} else {
+		if (metaclass(rtxt) == String) print (string) rtxt;
+		else print (object) rtxt;
+	}
+	#Ifnot;
+	if (metaclass(rtxt) == String) print (string) rtxt;
+	else print (object) rtxt;
+	#Endif; ! USE_VORPLE;
+	#Endif; ! USE_HYPERLINKS;
+
+	!! Reestablece el estilo utilizado anteriormente y retorna:
+	Utils.set_text_style(previous_style);
+	return true;
+];
+
+!!------------------------------------------------------------------------------
 !! Créditos detallados de la aplicación.
 !!
 !!	@override verblibm.h
-!!	@version 1.1
+!!	@version 1.0
 !!------------------------------------------------------------------------------
 [ VersionSub
 	ix;
@@ -764,30 +818,6 @@ CompassDirection d_obj "abajo" compass
 		new_line;
     }
 	#Endif; ! VERSION_DESKTOP
-
-	new_line;
-	print "Relato original: ", (strong) "Miguel de Cervantes", ".^";
-	print "Diseño y programación: ",
-		(strong) "J. Francisco Martín Lisaso",".^";
-	print "Composición musical: ", (strong) "Antonio de Cabezón", ".^";
-	print "Grabación: ", (strong) "Joan Benson", ".^";
-	print "Ilustración de portada: ", (strong) "Gustave Doré", ".^";
-
-	new_line;
-	print "Este programa es software libre: usted puede redistribuirlo y/o
-	modificarlo bajo los términos de la Licencia Pública General GNU publicada
-	por la Fundación para el Software Libre, ya sea la versión 3 de la
-	Licencia, o (a su elección) cualquier versión posterior.
-	^^
-	Este programa se distribuye con la esperanza de que sea útil, pero SIN
-	GARANTÍA ALGUNA; ni siquiera la garantía implícita MERCANTIL o de APTITUD
-	PARA UN PROPÓSITO DETERMINADO. Consulte los detalles de la Licencia Pública
-	General GNU para más información.
-	^^
-	Debería haber recibido una copia de la Licencia Pública General GNU junto a
-	este programa. En caso contrario, consulte <http://www.gnu.org/licenses/>.
-	^^
-	Copyright (c) 2018, J. Francisco Martín";
 	new_line;
 	return true;
 ];
