@@ -1,0 +1,241 @@
+
+
+!!==============================================================================
+!!
+!!	EL BARÓN
+!!	Escena cero (objetos comunes)
+!!
+!!==============================================================================
+!!
+!!	Archivo:		baron_scene-zero.xinf
+!!	Autor(es):		Victor Gijsbers
+!!					J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Idioma:			ES (Español)
+!!	Sistema:		Inform-INFSP 6
+!!	Plataforma:		Máquina-Z/Glulx
+!!	Versión:		0.0
+!!	Fecha:			2019/06/XX
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	Este archivo forma parte de la ficción interactiva EL BARÓN.
+!!
+!!	EL BARÓN es software libre: usted puede redistribuirlo y/o
+!!	modificarlo bajo los términos de la Licencia Pública General
+!!	GNU publicada por la Fundación para el Software Libre, ya
+!!	sea la versión 3 de la Licencia, o (a su elección) cualquier
+!!	versión posterior.
+!!
+!!	EL BARÓN se distribuye con la esperanza de que sea útil,
+!!	pero SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
+!!	MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU
+!!	para más información.
+!!
+!!	Debería haber recibido una copia de la Licencia Pública
+!!	General GNU junto a EL BARÓN. En caso contrario, consulte
+!!	<http://www.gnu.org/licenses/>.
+!!
+!!	Copyright (c) 2004, Victor Gijsbers
+!!	Copyright (c) 2019, J. Francisco Martín
+!!
+!!------------------------------------------------------------------------------
+
+
+!!==============================================================================
+!!
+!!	1)	En algún lugar…
+!!
+!!------------------------------------------------------------------------------
+
+!! @Limbo
+Room	Limbo "En algún lugar…"
+ has	male,
+ with	name_f	'babia' 'parte',
+		name_m	'limbo' 'lugar' 'sueno' 'vacio',
+		gender	G_MASCULINO,
+		adjectives 'algun' 'alguna',
+		!!------------------
+		description [;
+			print "Más allá de la barrera casi insuperable que separa la realidad de todo lo demás. Un lugar etéreo, donde la vida, la materia y la vitalidad no son necesariamente constantes; un lugar donde el tiempo y el espacio no existen tal y como los capta nuestro ser despierto…";
+			if (self hasnt visited) {
+				print " *bienvenido al mundo del sueño*.";
+			}
+			new_line;
+			return true;
+		],
+;
+
+!! @Baron
+Character	Baron "protagonista" Limbo
+ has	male proper,
+ with	name_m 'personaje' 'protagonista',
+		gender G_MASCULINO,
+		!!------------------
+		become_lycanthrope [;
+			if (self.has_become_a_lycanthrope()) return true;
+			self.lycanthrope = true;
+			!! TODO - revisar
+			print "La cálida y dulce sangre se derrama por tu lengua. Arrancas trozos de carne del cuerpo y los devoras con ávidez. Tu hijo empieza a alimentarse también de la presa, el primer bocado que prueba esta semana aparte de medio vole. Te giras hacia él y lames su pelaje. Él aúlla contentedly, y después continúa comiendo. No conoce otros peligros y se imagina que está a salvo.";
+			new_line;
+			Utils.press_any_key();
+			new_line;
+			!! TODO - revisar
+			print "Pero tú sabes más. Mientras el cazador siga viviendo en la gran casa de piedra ninguno de los dos estaréis a salvo. Y ahora que esta comida inesperada te ha dado nuevas fuerzas es el momento de ir y enfrentarte a él.";
+			new_line;
+			return true;
+		],
+		daemon [;
+			if (self.is_burning()) {
+				if (self.burning_counter == 2) {
+					new_line;
+					print "[El Fuego] abrasa[n Fuego] tu cuerpo. Ves cómo el metal de tu [Armadura](armadura) empieza a tornarse rojo y se va volviéndo más brillante a cada momento que pasa.";
+					new_line;
+				} else if (self.burning_counter == 3) {
+					give E1_ElHombreArdiente on;
+					new_line;
+					print "Golpeas las [Fuego](llamas) desesperadamente intentando apagarlas. Pero es inútil. Peor aún, observas con espanto que el metal de la [Armadura](armadura) ha comenzado a derretirse. Todas tus terminaciones nerviosas parecen estar aullando por el dolor.";
+					new_line;
+				} else if (self.burning_counter >= 4) {
+					new_line;
+					print "El metal fundido penetra a través de tu piel y se mezcla con el grasa y el músculo licuados. No ves nada ya. No oyes nada. No piensas en nada. La experiencia del dolor es lo único que ocupa los últimos vestigios de tu consciencia. Y ni siquiera eso. *Dolor* es una palabra que no significa nada. *Dolor* no se acerca a describir este tormento. Caes de rodillas tratando de gritar por última vez mientras tus cuerdas vocales y tus pulmones arden. La oscuridad te cubre como una manta fría.";
+					new_line;
+					print "^^^", (parser) "Pulsa una tecla.";
+					Utils.press_any_key();
+					return EndSceneOne();
+				}
+				self.burning_counter++;
+			}
+			return true;
+		],
+		description [;
+			if (self.has_become_a_lycanthrope()) {
+				!! TODO - revisar
+				print "Te sientes fortalezida con la caliente sangre del humano corriéndote por las venas.";
+			} else {
+				!! TODO
+				print "";
+			}
+			new_line;
+			return true;
+		],
+		has_become_a_lycanthrope [;
+			return self.lycanthrope;
+		],
+		is_blind [;
+			return self.blind;
+		],
+		is_burning [;
+			return self.burning;
+		],
+		is_naked [
+			n_clothes obj;
+			n_clothes = 0;
+			objectloop(obj in self && obj has clothing && obj has worn) {
+				n_clothes++;
+			}
+			return (n_clothes == 0);
+		],
+		is_running_away [;
+			return self.running_away;
+		],
+		reset [;
+			self.blind = false;
+			self.burning = false;
+			self.burning_counter = 0;
+			self.lycanthrope = false;
+			self.running_away = false;
+		],
+		sets_fire [ obj tool
+			fire_code;
+			!! Calcula las precondiciones para poder prender fugo a un objeto:
+			fire_code = 0;
+			if (tool == Antorcha) {
+				if (IndirectlyContains(self, Antorcha)) {
+					fire_code = 3;
+				!! TODO
+				} else if (TestScope(self, Antorcha)) {
+					print "(Primero coges la antorcha).";
+					new_line;
+					<Take Antorcha>;
+					fire_code = 3;
+				} else {
+					<<Take Antorcha>>;
+				}
+			} else if (tool) {
+				fire_code = 2;
+			} else {
+				if (IndirectlyContains(self, Antorcha)) {
+					if (Antorcha has on) {
+						fire_code = 3;
+					} else {
+						fire_code = 2;
+					}
+				}
+			}
+			!! Lleva a cabo la acción y muestra un mensaje con su resultado:
+			if (fire_code == 0) {
+				print "Necesitas fuego para hacer algo así.";
+			} else if (fire_code == 1) {
+				print "[El tool] no puede prender fuego a nada.";
+			} else if (fire_code == 2) {
+				print "Ahora que la antorcha se ha apagado ya no la puedes utilizar para prenderle fuego a nada.";
+			} else {
+				!! TODO - Si el PC está en una localidad interior, durante
+				!! algunos turnos podría permanecer en el aire el humo del
+				!! fuego, hasta disiparse finalmente
+				move obj to Limbo;
+				switch (obj) {
+					AlbumFotos:
+						print "El viejo álbum familiar arde pasto de las llamas. Compruebas con una mezcla de horror y satisfacción cómo la voracidad infinita del fuego es capaz de llevarse consigo incluso el recuerdo de una felicidad perdida.";
+					RetratoFamiliar:
+						print "Hace mucho tiempo que no queda rastro alguno de esa familia feliz de la fotografía, y ahora el fuego se encarga de destruir su recuerdo. Cuando se apagan las llamas no queda más que la sombra de una mentira.";
+				}
+			}
+			new_line;
+			return true;
+		],
+		!!------------------
+		blind false,
+		burning false,
+		lycanthrope false,
+		running_away false,
+ private
+		burning_counter 0,
+;
+
+!! @NieveCastillo
+Atrezzo	NieveBosque "nieve"
+ has	female,
+ with	found_in Edificio EntradaCastillo PatioArmas,
+		name_f 'nieve',
+		gender G_FEMENINO,
+		!!------------------
+		before [;
+			Dig,
+			LookUnder:
+				if (second ~= nothing
+					&& second ~= player
+					&& IndirectlyContains(player, second)) {
+					print "Hurgas aquí y allá entre [la self] con [el second], sin encontrar nada.";
+					new_line;
+					return true;
+				}
+				print "Hurgas aquí y allá entre [la self], sin encontrar nada.";
+				new_line;
+				return true;
+			Search:
+				<<Dig self>>;
+		],
+		description [;
+			print "A veces la nieve otorga a los objetos una cualidad de cuento de hadas al posarse sobre ellos. Hoy no, no esta nieve. Esta nieve parece querer asfixiarlos y enterrarlos para siempre.";
+			new_line;
+			return true;
+		],
+		react_before [;
+			Dig:
+				if (noun == nothing || noun == location) {
+					<<Dig self second>>;
+				}
+		],
+;

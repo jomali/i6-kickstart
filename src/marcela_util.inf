@@ -1,0 +1,1083 @@
+
+!!==============================================================================
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA
+!!	Objeto con rutinas de utilidad
+!!
+!!==============================================================================
+!!
+!!	Archivo:		marcela_util.inf
+!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Idioma:			ES (Español)
+!!	Sistema:		Inform-INFSP 6
+!!	Plataforma:		Máquina-Z/Glulx
+!!	Versión:		1.0
+!!	Fecha:			2018/11/18
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	Este archivo forma parte de la ficción interactiva
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA.
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA es software libre: usted puede
+!!	redistribuirlo y/o modificarlo bajo los términos de la Licencia
+!!	Pública General GNU publicada por la Fundación para el Software
+!!	Libre, ya sea la versión 3 de la Licencia, o (a su elección)
+!!	cualquier versión posterior.
+!!
+!!	HISTORIA DE GRISÓSTOMO Y MARCELA se distribuye con la esperanza de
+!!	que sea útil, pero SIN GARANTÍA ALGUNA; ni siquiera la garantía
+!!	implícita MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU para más
+!!	información.
+!!
+!!	Debería haber recibido una copia de la Licencia Pública General GNU
+!!	junto a HISTORIA DE GRISÓSTOMO Y MARCELA. En caso contrario,
+!!	consulte <http://www.gnu.org/licenses/>.
+!!
+!!	Copyright (c) 2018, J. Francisco Martín
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	El objeto Util encapsula un conjunto de rutinas de utilidad ---liberando
+!!	parte del alcance global de la aplicación---:
+!!
+!!	<>	configure_highlight_style()
+!!	<>	configure_hyperlinks()
+!!	<>	erase_window()
+!!	<>	extended_print()
+!!	<>	fade_in()
+!!	<>	fade_out()
+!!	<>	get_grammatical_inflection()
+!!	<>	get_highlight_style()
+!!	<>	get_hyperlinks_status()
+!!	<>	get_text_style()
+!!	<>	horizontal_rule()
+!!	<>	initialise_multimedia()
+!!	<>	play_sfx()
+!!	<>	press_any_key()
+!!	<>	read_configuration_file()
+!!	<>	restart()
+!!	<>	set_grammatical_inflection()
+!!	<>	set_highlight_style()
+!!	<>	set_hyperlinks_status()
+!!	<>	set_text_style()
+!!	<>	spanish_nominative_pronoun()
+!!	<>	website_hyperlink()
+!!	<>	write_configuration_file()
+!!
+!!------------------------------------------------------------------------------
+
+#Ifdef USE_VORPLE;
+Array _hyperlinks_temp_array buffer LEN_HUGEHUGESTR;
+#Endif; ! USE_VORPLE;
+
+Object	Util "(Utilities)"
+ with	!!----------------------------------------------------------------------
+		!! Muestra un menú a través del que el usuario puede modificar el
+		!! estilo con el que se imprimen las palabras clave para cada uno de
+		!! los diferentes tipos de objetos de la obra.
+		!!
+		!!	@param {string} [txt = 0] - Cadena de texto que se imprime al final
+		!!		del menú. Debe ser algo similar a: "Pulsa INTRO para aceptar."
+		!!	@returns {boolean} Verdadero si se está utilizando la extensión
+		!!		'Hyperlinks.h'. Falso en caso contrario
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		configure_highlight_style [ txt
+			done i highlight temp previous_style;
+			while (~~done) {
+				self.erase_window();
+				new_line;
+				print "Puedes, además, modificar el aspecto con el que se
+				imprimen los nombres de los objetos interactivos de la obra
+				---incluso aunque los hipervínculos estén desactivados---.
+				Introduce el número del tipo de palabra destacada para rotar
+				entre los distintos estilos de resaltado disponibles y
+				seleccionar aquel que se adecue mejor a tus preferencias
+				personales:";
+				new_line;
+				new_line;
+				for (i = 1 : i <= 2 : i++) {
+					switch (i) {
+						1:
+							print "1) Objetos importantes: ";
+						2:
+							print "2) Otros objetos: ";
+					}
+					highlight = self.get_highlight_style(i);
+					temp = ~~self.get_hyperlinks_status(i);
+					switch (highlight) {
+						TEXT_STYLE_UPRIGHT:		temp = "sin estilo";
+						TEXT_STYLE_STRESSED:	temp = "enfatizado (a)";
+						TEXT_STYLE_NOTE:		temp = "enfatizado (b)";
+						TEXT_STYLE_IMPORTANT:	temp = "destacado (a)";
+						TEXT_STYLE_HEADER:		temp = "destacado (b)";
+						TEXT_STYLE_MONOSPACED:	temp = "monoespaciado";
+						TEXT_STYLE_REVERSED:	temp = "invertido";
+						TEXT_STYLE_USER1:		temp = "color de fondo";
+					}
+					self.extended_print(temp, 0, highlight);
+					print ".";
+					new_line;
+				}
+				new_line;
+				print "NOTA: Cuando los hipervínculos están activados hay menos
+				opciones de estilos disponibles.";
+				new_line;
+				if (txt ~= 0 && metaclass(txt) == String) {
+					new_line;
+					previous_style = self.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print (string) txt;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					self.set_text_style(previous_style);
+				}
+				temp = 0;
+				switch (self.press_any_key()) {
+					32, -6: ! INTRO/ESPACIO
+						done = true;
+					'1':
+						temp = 1;
+					'2':
+						temp = 2;
+				}
+				if (temp > 0) {
+					switch (self.get_highlight_style(temp)) {
+						TEXT_STYLE_UPRIGHT:
+							highlight = TEXT_STYLE_STRESSED;
+						TEXT_STYLE_STRESSED:
+							highlight = TEXT_STYLE_NOTE;
+						TEXT_STYLE_NOTE:
+							highlight = TEXT_STYLE_IMPORTANT;
+						TEXT_STYLE_IMPORTANT:
+							highlight = TEXT_STYLE_HEADER;
+						TEXT_STYLE_HEADER:
+							highlight = TEXT_STYLE_MONOSPACED;
+						TEXT_STYLE_MONOSPACED:
+							highlight = TEXT_STYLE_REVERSED;
+						TEXT_STYLE_REVERSED:
+							highlight = TEXT_STYLE_USER1;
+						TEXT_STYLE_USER1:
+							highlight = TEXT_STYLE_UPRIGHT;
+						default:
+							highlight = -1;
+					}
+					self.set_highlight_style(temp, highlight);
+				}
+			}
+			self.erase_window();
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Muestra un menú a través del que el usuario puede activar/desactivar
+		!! los hipervínculos para cada uno de los diferentes tipos de objetos
+		!! de la obra.
+		!!
+		!!	@param {string} [txt = 0] - Cadena de texto que se imprime al final
+		!!		del menú. Debe ser algo similar a: "Pulsa INTRO para aceptar."
+		!!	@returns {boolean} Verdadero si se está utilizando la extensión
+		!!		'Hyperlinks.h'. Falso en caso contrario
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		configure_hyperlinks [ txt
+			done previous_style i;
+			while (~~done) {
+				self.erase_window();
+				new_line;
+				previous_style = self.set_text_style(TEXT_STYLE_HEADER);
+				print (string) Story;
+				self.set_text_style(previous_style);
+				print " utiliza un sistema de hipervínculos para facilitar la
+				interacción con los objetos presentes en la obra a través del
+				ratón. Hay dos clases de hipervínculo: 1) asociado a objetos
+				importantes en la historia y 2) asociados a otros objetos
+				interactivos. Puedes activar o desactivar cada tipo de
+				hipervínculo introduciendo el número de su clase:";
+				new_line;
+				new_line;
+				for (i = 1 : i <= 2 : i++) {
+					switch (i) {
+						1:
+							print "1) Objetos importantes: ";
+						2:
+							print "2) Otros objetos: ";
+					}
+					if (self.get_hyperlinks_status(i)) {
+						print "@<<activados@>>";
+					} else {
+						print (user2) "@<<desactivados@>>";
+					}
+					print ".";
+					new_line;
+				}
+				if (txt ~= 0 && metaclass(txt) == String) {
+					new_line;
+					previous_style = self.set_text_style(TEXT_STYLE_PARSER);
+					print (string) TEXT_STYLE_PARSER_PREFIX;
+					print (string) txt;
+					print (string) TEXT_STYLE_PARSER_SUFIX;
+					self.set_text_style(previous_style);
+				}
+				switch (self.press_any_key()) {
+					32, -6:	! INTRO/ESPACIO
+						done = true;
+					'1':
+						i = 1;
+					'2':
+						i = 2;
+				}
+				self.set_hyperlinks_status(i, ~~self.get_hyperlinks_status(i));
+			}
+			self.erase_window();
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Deja las ventanas de la obra en blanco.
+		!!
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		erase_window [;
+		    #Ifdef TARGET_ZCODE;
+		    @erase_window -1;
+		    #Ifnot; ! TARGET_GLULX
+		    if (gg_quotewin) {
+				glk($0024, gg_quotewin, 0); ! close_window
+				gg_quotewin = 0;
+		    }
+		    glk($002A, gg_mainwin); ! window_clear
+		    if (gg_statuswin) glk($002A, gg_statuswin); ! window_clear
+		    #Endif;
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Imprime una cadena de caracteres cualquiera o el nombre corto de un
+		!! objeto pasado como parámetro, seleccionando un estilo de texto
+		!! destacado y, si es posible, creando un hipervínculo asociado a la
+		!! la cadena de caracteres o el objeto pasados.
+		!!
+		!!	@param {string|Object} item - Cadena de caracteres u objeto del que
+		!!		se imprime su nombre corto, con un estilo de texto destacado
+		!!		adecuado y, si es posible, un hipervínculo asociado a él
+		!!	@param {string} alternative - Permite especificar un texto
+		!!		alternativo a imprimir en lugar de 'item'. Se sigue utilizando
+		!!		'item', no obstante, para determinar el estilo de texto
+		!!		destacado (si se hace automáticamente ---si el parámetro
+		!!		'style' es 0---) y para asociar a él el hipervínculo
+		!!	@param {integer} style - Código numérico indicando un estilo
+		!!		de texto a utilizar en lugar del estilo determinado
+		!!		automáticamente en función de la definición de 'item'
+		!!	@returns {boolean} Falso si no se has especificado los parámetros
+		!!		adecuados. Verdadero en caso contrario
+		!!	@version 1.1
+		!!----------------------------------------------------------------------
+		extended_print [ item alternative style
+			object_type previous_style status;
+			object_type = 2; ! las cadenas se tratan como objs. no importantes
+			if (metaclass(item) == Object) {
+				if (item has remarkable) object_type = 1;
+				else object_type = 2;
+			}
+
+			!! Establece el estilo de texto destacado:
+			previous_style = self.get_text_style();
+			if (style == -1) style = self.get_highlight_style(object_type);
+			if (previous_style == 0) self.set_text_style(style);
+
+			!! Determina si los hipervínculos están activados para el tipo de
+			!! 'item' y crea un hipervínculo sobre él (o lo imprime):
+			status = self.get_hyperlinks_status(object_type);
+			if (metaclass(alternative) == String) item = alternative;
+			#Ifdef USE_HYPERLINKS;
+			if (status) Hyperlink(item);
+			else self.print_object_short_name(item);
+			#Ifnot;
+			#Ifdef USE_VORPLE;
+			if (status) self.create_vorple_hyperlink(item);
+			else self.print_object_short_name(item);
+			#Ifnot;
+			self.print_object_short_name(item);
+			#Endif; ! USE_VORPLE;
+			#Endif; ! USE_HYPERLINKS;
+
+			!! Reestablece el estilo utilizado por la obra y retorna:
+			self.set_text_style(previous_style);
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Realiza un efecto de subida de volumen gradual de un recurso de
+		!! audio. Permite especificar si el efecto se realiza en tiempo real
+		!! ---por defecto--- o deteniendo la aplicación mientras se produce. En
+		!! caso de que el recurso no se encontrase en reproducción, se inicia
+		!! antes con un volumen del 0%. Si no se especifica el tiempo del
+		!! efecto, la subida de volumen es inmediata.
+		!!
+		!! Debe tenerse en cuenta que no pueden lanzarse dos efectos de 'fade'
+		!! al mismo tiempo ---el temporizador Glk sólo puede ser utilizado por
+		!! una operación en un momento dado---. Si ya hay un efecto en
+		!! ejecución, los nuevos efectos no se lanzan; los nuevos sonidos se
+		!! reproducirán directamente con el volumen final, sin subidas o
+		!! bajadas graduales de volumen.
+		!!
+		!! Las funcionalidades multimedia sólo son soportadas en Glulx.
+		!!
+		!!	@param {Sound} track - El recurso de audio sobre el que se lanza
+		!!		el efecto. Si el recurso no estaba en reproducción primero se
+		!!		inicia con un volumen del 0%
+		!!	@param {integer} [volume=-1] - Volumen final en tanto por ciento
+		!!		con el que finaliza el efecto. -1 para indicar el volumen
+		!!		global de la aplicación. Si el volumen actual es mayor que
+		!!		'volume', retorna sin hacer nada
+		!!	@param {integer} [fade_time=0] - Milisegundos que dura el efecto de
+		!!		'fade-in' desde el volumen actual del recurso de audio hasta
+		!!		el especificado por 'volume'
+		!!	@param {boolean} [simple_fade_in=false] - Por defecto el efecto se
+		!!		realiza en tiempo real, pero si se invoca con este parámetro
+		!!		activado (verdadero), la aplicación se detiene mientras se
+		!!		lleva a cabo el 'fade-in'
+		!!	@returns {boolean} Verdadero si la versión compilada utiliza
+		!!		recursos multimedia y se lanza el efecto con éxito. Falso en
+		!!		caso contrario
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		fade_in [ track volume fade_time simple_fade_in
+			result js_track;
+			!! FIXME - si el volumen pasado como parámetro < volumen actual
+			!! FIXME - simple_fade_in
+			result = false;
+			#Ifdef TARGET_GLULX;
+
+			#Ifdef USE_DAMUSIX;
+			if (volume == 0) {
+				volume = -1;
+			}
+			if (fade_time == 0 || Damusix.EnFade()) {
+				Damusix.Volumen(track, volume);
+				if (~~Damusix.SonandoDeFondo(track)) {
+					Damusix.Tocar(track);
+				}
+			} else {
+				if (~~Damusix.SonandoDeFondo(track)) {
+					Damusix.Volumen(track, 0);
+					Damusix.Tocar(track);
+				}
+				Damusix.FadeIn(track, fade_time, volume);
+			}
+			result = true;
+			#Endif; ! USE_DAMUSIX;
+
+			#Ifdef USE_VORPLE;
+			if (isVorpleSupported()) {
+				switch (track) {
+					MUS_SOUNDTRACK:
+						js_track = "jsSoundtrack";
+						VorpleExecuteJavaScriptCommand("
+							var jsSoundtrack = new Howl({
+								src: ['resources/audio/antonio-de-cabezon_duuiensela.ogg'],
+								loop: true,
+								volume: 1.0
+							});
+						");
+						VorpleExecuteJavaScriptCommand(BuildCommand("
+							", js_track, ".volume(0);
+							", js_track, ".play();
+							result = ", js_track, ".fade(0.0, 0.75, 100);
+							console.log('Fade-in: ' + result);
+						"));
+					SFX_WIND:
+						js_track = "jsWindSFX";
+						VorpleExecuteJavaScriptCommand("
+							var jsWindSFX = new Howl({
+								src: ['resources/audio/bdvictor_wheat-in-the-wind.ogg'],
+								loop: true,
+								volume: 1.0
+							});
+						");
+						VorpleExecuteJavaScriptCommand(BuildCommand("
+							", js_track, ".volume(0);
+							", js_track, ".play();
+							result = ", js_track, ".fade(0.0, 1.0, 100);
+							console.log('Fade-in: ' + result);
+						"));
+				}
+				result = true;
+			} else {
+				result = false;
+			}
+			#Endif; ! USE_VORPLE;
+
+			#Endif; ! TARGET_GLULX;
+			!! (por evitar alertas del compilador)
+			track = volume + fade_time + simple_fade_in + js_track;
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Realiza un efecto de bajada de volumen gradual de un recurso de
+		!! audio. Permite especificar si el efecto se realiza en tiempo real
+		!! ---por defecto--- o deteniendo la aplicación mientras se produce, y
+		!! si debe reproducirse un nuevo recurso de audio una vez finalizado el
+		!! efecto.
+		!!
+		!! Debe tenerse en cuenta que no pueden lanzarse dos efectos de 'fade'
+		!! al mismo tiempo ---el temporizador Glk sólo puede ser utilizado por
+		!! una operación en un momento dado---. Si ya hay un efecto en
+		!! ejecución, los nuevos efectos no se lanzan; los nuevos sonidos se
+		!! reproducirán directamente con el volumen final, sin subidas o
+		!! bajadas graduales de volumen.
+		!!
+		!! Las funcionalidades multimedia sólo son soportadas en Glulx.
+		!!
+		!!	@param {Sound} track - El recurso de audio sobre el que se lanza
+		!!		el efecto
+		!!	@param {integer} [volume=0] - Volumen final en tanto por ciento con
+		!!		el que finaliza el efecto. Si el volumen final es 0, la
+		!!		reproducción se detiene automáticamente. Si el volumen actual
+		!!		es inferior que 'volume', retorna sin hacer nada
+		!!	@param {integer} [fade_time=0] - Milisegundas que dura el efecto de
+		!!		'fade-out' desde el volumen actual del recurso de audio hasta
+		!!		el especificado por 'volume'
+		!!	@param {boolean} [simple_fade_in=false] - Por defecto el efecto se
+		!!		realiza en tiempo real, pero si se invoca con este parámetro
+		!!		activado (verdadero), la aplicación se detiene mientras se
+		!!		lleva a cabo el 'fade-out'
+		!!	@param {Sound} [post_track=0] - Recurso de audio a reproducir tras
+		!!		efectuar el efecto de 'fade-out' sobre 'track'
+		!!	@returns {boolean} Verdadero si la versión compilada utiliza
+		!!		recursos multimedia y se lanza el efecto con éxito. Falso en
+		!!		caso contrario
+		!!	@version 4.1
+		!!----------------------------------------------------------------------
+		fade_out [ track volume fade_time simple_fade_out post_track
+			result js_track;
+			result = false;
+			#Ifdef TARGET_GLULX;
+
+			#Ifdef USE_DAMUSIX;
+			if (Damusix.QueVolumen(track) > 0) {
+				if (fade_time == 0 || Damusix.EnFade()) {
+					if (volume == 0) Damusix.Parar(track);
+					else Damusix.Volumen(track, volume);
+					if (post_track) Damusix.Tocar(post_track);
+				} else {
+					if (simple_fade_out) {
+						Damusix.SimpleFadeOut(track, fade_time, volume);
+						if (post_track) Damusix.Tocar(post_track);
+					} else {
+						Damusix.FadeOut(track, fade_time, volume, post_track);
+					}
+				}
+				result = true;
+			}
+			#Endif; ! USE_DAMUSIX;
+
+			#Ifdef USE_VORPLE;
+			if (isVorpleSupported()) {
+				switch (track) {
+					MUS_SOUNDTRACK:	js_track = "jsSoundtrack";
+					SFX_WIND:		js_track = "jsWindSFX";
+				}
+				VorpleExecuteJavaScriptCommand(BuildCommand("
+					if (", js_track, ".playing()) {
+						result = ", js_track, ".fade(1.0, 0.0, 200);
+						console.log('Fade out: ' + result);
+					}
+				"));
+				result = true;
+			} else {
+				result = false;
+			}
+			#Endif; ! USE_VORPLE;
+
+			#Endif; ! TARGET_GLULX;
+			!! (por evitar alertas del compilador)
+			track = volume + fade_time + simple_fade_out + post_track
+				+ js_track;
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Retorna el código numérico de la flexión gramatical actual utilizada
+		!! por la obra, tal y como se definen en la extensión 'SpanishLM.h':
+		!!
+		!!	1)	Presente, primera persona
+		!!	2)	Presente, segunda persona. (Valor por defecto).
+		!!	3)	Presente, tercera persona
+		!!	4)	Pasado, primera persona
+		!!	5)	Pasado, segunda persona
+		!!	6)	Pasado, tercera persona
+		!!	7)	Futuro, primera persona
+		!!	8)	Futuro, segunda persona
+		!!	9)	Futuro, tercera persona
+		!!
+		!!	@returns {integer} Código numérico de la flexión gramatical actual
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		get_grammatical_inflection [
+			result;
+			result = 2; ! (por defecto)
+			#Ifdef USE_SPANISH_LM;
+			result = _grammatical_inflection;
+			#Endif; ! USE_SPANISH_LM;
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Retorna el código numérico del estilo de texto de las palabras
+		!! destacadas para el tipo de objeto con el código pasado como
+		!! parámetro.
+		!!
+		!!	@param {integer} object_type - Código numérico del tipo de objeto
+		!!		para el que se pretende conocer el estilo de texto resaltado
+		!!	@returns {integer} Código numérico del estilo de texto resaltado
+		!!		para los objetos de tipo 'object_type'. 0 por defecto
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		get_highlight_style [ object_type
+			result;
+			result = 0; ! (por defecto)
+			if ((object_type-1) < (self.#highlight_styles)/WORDSIZE) {
+				result = self.&highlight_styles-->(object_type-1);
+			}
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Retorna el estado (si están o no activados) de los hipervínculos
+		!! para el tipo de objeto con el código pasado como parámetro.
+		!!
+		!!	@param {integer} object_type - Código numérico del tipo de objeto
+		!!		para el que se pretende conocer el estado de los hipervínculos
+		!!	@returns {boolean} Verdadero si los hipervínculos para los objetos
+		!!		de tipo 'object_type' están activados. Falso en caso contrario
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		get_hyperlinks_status [ object_type
+			result;
+			result = false; ! (por defecto)
+			if ((object_type-1) < (self.#hyperlinks_status)/WORDSIZE) {
+				result = self.&hyperlinks_status-->(object_type-1);
+			}
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Retorna el código numérico del estilo de texto utilizado actualmente
+		!! por la obra, tal y como se definen en la extensión 'textStyle.h':
+		!!
+		!!	1) recto
+		!!	2) enfático
+		!!	3) importante
+		!!	4) monoespaciado
+		!!	5) encabezado
+		!!	6) nota
+		!!	7) cita
+		!!	8) entrada
+		!!	9) usuario 1
+		!!	10) usuario 2
+		!!
+		!!	@returns {integer} Código numérico del estilo de texto utilizado
+		!!		actualmente. 0 por defecto
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		get_text_style [
+			result;
+			result = 0; ! (por defecto)
+			#Ifdef TEXT_STYLES;
+			result = _current_text_style;
+			#Endif; ! TEXT_STYLES;
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Imprime una regla horizontal. Centrada en pantalla si se compila
+		!! para plataformas de escritorio, o alineada a la izquierda en otro
+		!! caso.
+		!!
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.1
+		!!----------------------------------------------------------------------
+		horizontal_rule [
+			previous_style;
+			previous_style = self.set_text_style(TEXT_STYLE_MONOSPACED);
+			#Ifdef VERSION_DESKTOP;
+			spaces (ScreenWidth() - 1 - 7) / 2; ! 7 -> longitud de "*  *  *"
+			#Endif; ! VERSION_DESKTOP;
+			print "*  *  *";
+			self.set_text_style(previous_style);
+			new_line;
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Inicializa los recursos multimedia de la aplicación.
+		!!
+		!! Al utilizar Damusix deben inicializarse los canales de audio.
+		!!
+		!! Al utilizar Vorple se inicializan las diferentes variables
+		!! Javascript con las que se gestionan los sonidos.
+		!!
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		initialise_multimedia [;
+			#Ifdef TARGET_GLULX;
+
+			#Ifdef USE_DAMUSIX;
+			!!		Damusix.AsignarCanal(
+			!!			SONIDO,
+			!!			CANAL [0-9],
+			!!			VOLUMEN [0-100],
+			!!			REPETICIONES (-1 para repeticiones infinitas)
+			!!		);
+			Damusix.AsignarCanal(MUS_SOUNDTRACK, 0, 100, -1);
+			Damusix.AsignarCanal(SFX_WIND, 1, 100, -1);
+			#Endif; ! USE_DAMUSIX;
+
+			#Endif; ! TARGET_GLULX;
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Reproduce un efecto de audio. En Damusix se utiliza uno de los
+		!! canales virtuales.
+		!!
+		!! Las funcionalidades multimedia sólo son soportadas en Glulx.
+		!!
+		!!	@param {Sound} sound - Recurso de audio
+		!!	@param {integer} [volume=100] - Volumen en tanto por ciento con el
+		!!		que se reproduce el recurso de audio 'sound'
+		!!	@returns {boolean} Verdadero si la versión compilada utiliza
+		!!		recursos multimedia. Falso en caso contrario
+		!!	@version 2.0
+		!!----------------------------------------------------------------------
+		play_sfx [ sound volume
+			result;
+			!! FIXME - gestionar correctamente el valor de result
+			result = false;
+			#Ifdef TARGET_GLULX;
+
+			#Ifdef USE_DAMUSIX;
+			if (volume == 0) {
+				volume = 100;
+			}
+			Damusix.TocarV(sound, volume);
+			#Endif; ! USE_DAMUSIX;
+
+			#Ifdef USE_VORPLE;
+			result = self.fade_in(sound);
+			#Endif; ! USE_VORPLE;
+
+			#Endif; ! TARGET_GLULX;
+			sound = volume = 0; ! (por evitar alertas del compilador)
+ 			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Espera una pulsación de tecla del usuario antes de continuar. Si se
+		!! invoca con el primer parámetro opcional activado (verdadero), la
+		!! obra continúa con su ejecución, aunque el usuario no pulse ninguna
+		!! tecla, una vez pase esa cantidad de décimas de segundo.
+		!!
+		!!	@param {integer} [delay=0] - Si se introduce un entero, la obra
+		!!		continúa tras esperar esa cantidad 'delay' de décimas de
+		!!		segundo, aunque el usuario no pulse una tecla
+		!!	@returns {char} Caracter introducido por el usuario
+		!!	@version 2.0
+		!!----------------------------------------------------------------------
+		press_any_key [ delay
+			result;
+			#Ifdef USE_DAMUSIX;
+			if (Damusix.EnFade()) delay = 0;
+			#Endif; ! USE_DAMUSIX;
+			if (delay > 0) result = KeyDelay(delay);
+			else result = KeyCharPrimitive();
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Lee desde un fichero de texto externo los parámetros de
+		!! configuración de la obra.
+		!!
+		!!	@param {string} file_name - Nombre del fichero de texto del que se
+		!!		leen los parámetros de configuración
+		!!	@returns {boolean} Verdadero si el fichero se lee con éxito. Falso
+		!!		en caso contrario
+		!!----------------------------------------------------------------------
+		!! FIXME - comprobar funcionalidades de fichero externo
+		read_configuration_file [ file_name
+			file_ref str ch i a b c d;
+			#Ifdef TARGET_GLULX;
+			a = b = c = d = -1;
+			!!	glk_fileref_create_by_name(
+			!!		fileusage_Data + fileusage_BinaryMode,
+			!!		ChangeAnyToCString(file_name), 0);
+			file_ref = glk($0061, $00+$000, ChangeAnyToCString(file_name), 0);
+			if (file_ref ~= 0) {
+				!!	glk_stream_open_file(fileref, filemode_Read, 0);
+				str = glk($0042, file_ref, $02, 0);
+				glk($0063, file_ref); ! glk_fileref_destroy
+				for (i = 1 : i <= 4 : i++) {
+					do ch = glk($0090, str); ! glk_get_char_stream
+					until ((ch == null) || (ch >= 48 && ch <= 57));
+					if (ch == null) break;
+					switch (i) {
+						1:	a = (ch-48);
+						2:	b = (ch-48);
+						3:	c = (ch-48);
+						4:	d = (ch-48);
+					}
+					do ch = glk($0090, str); ! glk_get_char_stream
+					until ((ch == null) || (ch == 10)); ! (hasta nueva línea)
+				}
+				!! Cierra el archivo:
+				glk($0044, str, 0); ! glk_stream_close
+				!! Comprueba errores:
+				if (a < 0 || a > 1) return false;
+				if (b < 0 || b > 1) return false;
+				if (c < 0 || c > 1) return false;
+				if (d < 0 || d > 1) return false;
+				!! Transforma los códigos de estilo a los valores reales:
+				switch (c) {
+					1:	c = TEXT_STYLE_STRESSED;
+					2:	c = TEXT_STYLE_NOTE;
+					3:	c = TEXT_STYLE_IMPORTANT;
+					4:	c = TEXT_STYLE_HEADER;
+					5:	c = TEXT_STYLE_MONOSPACED;
+					6:	c = TEXT_STYLE_REVERSED;
+					7:	c = TEXT_STYLE_USER1;
+					default: c = TEXT_STYLE_UPRIGHT;
+				}
+				switch (d) {
+					1:	d = TEXT_STYLE_STRESSED;
+					2:	d = TEXT_STYLE_NOTE;
+					3:	d = TEXT_STYLE_IMPORTANT;
+					4:	d = TEXT_STYLE_HEADER;
+					5:	d = TEXT_STYLE_MONOSPACED;
+					6:	d = TEXT_STYLE_REVERSED;
+					7:	d = TEXT_STYLE_USER1;
+					default: d = TEXT_STYLE_UPRIGHT;
+				}
+				!! Establece los parámetros de configuración y retorna:
+				self.set_hyperlinks_status(1, a);
+				self.set_hyperlinks_status(2, b);
+				self.set_highlight_style(1, c);
+				self.set_highlight_style(2, d);
+				return true;
+			}
+			#Ifnot; ! TARGET_ZCODE;
+			!! (Por evitar alertas del compilador)
+			file_name = file_ref + str + ch + i + a + b + c + d;
+			#Endif; ! TARGET_
+
+			return false;
+		],
+		!!----------------------------------------------------------------------
+		!! Reestablece el modelo del mundo a su estado inicial.
+		!!
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		restart [
+			obj;
+			objectloop(obj ofclass Thing) {
+				give obj ~described;
+				give obj ~general;
+				give obj ~moved;
+			}
+			objectloop(obj ofclass Room) {
+				give obj ~general;
+				give obj ~visited;
+			}
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Establece el valor de la flexión gramatical utilizada por la obra.
+		!!
+		!!	@param {integer} new_grammatical_inflection - Código de la nueva
+		!!		flexión gramatical [1-9]
+		!!	@returns {integer} Código de la flexión gramatical reemplazada
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		set_grammatical_inflection [ new_grammatical_inflection
+			result;
+			result = 2; ! (por defecto)
+			#Ifdef USE_SPANISH_LM;
+			result = _grammatical_inflection;
+			SetGrammaticalInflection(new_grammatical_inflection);
+			#Endif; ! USE_SPANISH_LM;
+			new_grammatical_inflection = 0; ! (por evitar alertas del compil.)
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Establece el estilo de texto de las palabras destacadas para el
+		!! tipo de objeto pasado como parámetro.
+		!!
+		!! El sistema de palabras destacadas es dependiente del sistema de
+		!! hipervínculos, de manera que los estilos disponibles en un momento
+		!! dado dependen del estado de los hipervínculos para ese tipo de
+		!! objeto. Si se intenta establecer un estilo de texto que no es
+		!! compatible con el estado de los hipervínculos, la rutina asigna
+		!! automáticamente el siguiente estilo disponible.
+		!!
+		!!	@param {integer} object_type - Código numérico del tipo de objeto
+		!!		para el que se pretende modificar el estilo de texto resaltado
+		!!	@param {integer} text_style - Código numérico del nuevo estilo de
+		!!		texto resaltado que se asigna al tipo de objeto 'object_type'
+		!!	@returns {integer} Código numérico del estilo de texto resaltado
+		!!		que se había estado utilizando previamente para los objetos del
+		!!		tipo 'object_type'
+		!!	@version 2.0
+		!!----------------------------------------------------------------------
+		set_highlight_style [ object_type text_style
+			default_text_style result status;
+			!! Determina el estado del tipo de objeto:
+			switch (object_type) {
+				1:	default_text_style = DEFAULT_HIGHLIGHT_ST_1;
+				2:	default_text_style = DEFAULT_HIGHLIGHT_ST_2;
+			}
+			result = self.get_highlight_style(object_type);
+			status = self.get_hyperlinks_status(object_type);
+			!! Modifica el estilo de texto en función del estado calculado:
+			switch (text_style) {
+				TEXT_STYLE_UPRIGHT:
+					text_style = TEXT_STYLE_UPRIGHT;
+				TEXT_STYLE_STRESSED:
+					text_style = TEXT_STYLE_STRESSED;
+				TEXT_STYLE_NOTE:
+					if (status) text_style = TEXT_STYLE_IMPORTANT;
+					else text_style = TEXT_STYLE_NOTE;
+				TEXT_STYLE_IMPORTANT:
+					text_style = TEXT_STYLE_IMPORTANT;
+				TEXT_STYLE_HEADER:
+					if (status) text_style = TEXT_STYLE_MONOSPACED;
+					else text_style = TEXT_STYLE_HEADER;
+				TEXT_STYLE_MONOSPACED:
+					text_style = TEXT_STYLE_MONOSPACED;
+				TEXT_STYLE_REVERSED:
+					if (status) text_style = TEXT_STYLE_USER1;
+					else text_style = TEXT_STYLE_REVERSED;
+				TEXT_STYLE_USER1:
+					text_style = TEXT_STYLE_USER1;
+				default:
+					text_style = default_text_style;
+			}
+			!! Establece el estilo de texto y retorna el estilo previo:
+			if ((object_type-1) < (self.#highlight_styles)/WORDSIZE) {
+				self.&highlight_styles-->(object_type-1) = text_style;
+			}
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Establece el estado de los hipervínculos para el tipo de objeto
+		!! pasado como parámetro.
+		!!
+		!!	@param {integer} object_type - Código numérico del tipo de objeto
+		!!		para el que se pretende modificar el estado de los
+		!!		hipervínculos
+		!!	@param {boolean} status - Estado (activado/desactivado) que se
+		!!		asigna a los hipervínculos asociados al tipo de objeto
+		!!		'object_type'
+		!!	@returns {boolean} Estado de los hipervínculos que estaba
+		!!		establecido previamente para los objetos de tipo 'object_type'
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		set_hyperlinks_status [ object_type status
+			result highlight;
+			!! Establece el estado de los hipervínculos para 'object_type':
+			result = self.get_hyperlinks_status(object_type);
+			if ((object_type-1) < (self.#hyperlinks_status)/WORDSIZE) {
+				self.&hyperlinks_status-->(object_type-1) = status;
+			}
+			!! Actualiza el estilo de texto resaltado:
+			highlight = self.get_highlight_style(object_type);
+			self.set_highlight_style(object_type, highlight);
+			!! Retorna el estado previo:
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Establece el estilo de texto utilizado por la obra.
+		!!
+		!!	@param {integer} style - Código numérico [1-10] del nuevo estilo
+		!!		de texto
+		!!	@returns {integer} Código numérico del estilo de texto reemplazado
+		!!	@version 2.0
+		!!----------------------------------------------------------------------
+		set_text_style [ style
+			result;
+			result = 0; ! (por defecto)
+			#Ifdef TEXT_STYLES;
+			result = SetTextStyle(style);
+			#Endif; ! TEXT_STYLES;
+			style = 0; ! (por evitar alertas del compilador)
+			return result;
+		],
+		!!----------------------------------------------------------------------
+		!! Imprime el pronombre nominativo correcto correspondiente al objeto
+		!! pasado como parámetro.
+		!!
+		!!	@param {Object} obj - Objeto del que se pretende imprimir su
+		!!		pronombre nominativo
+		!!	@param {boolean} [capitalized=false] - Si es verdadero, imprime el
+		!!		pronombre con la primera letra en mayúscula
+		!!	@returns {boolean} Falso si el objeto pasado como parámetro no es
+		!!		un objeto. Verdadero en caso contrario
+		!!	@version 2.0
+		!!----------------------------------------------------------------------
+		spanish_nominative_pronoun [ obj capitalized;
+			if (metaclass(obj) == Object) {
+				switch (GetGNAOfObject(obj)) {
+					0, 6:
+						if (capitalized) print "Él";
+						else print "él";
+					1, 7:
+						if (capitalized) print "Ella";
+						else print "ella";
+					2, 8:
+						if (capitalized) print "Ello";
+						else print "ello";
+					3, 9:
+						if (capitalized) print "Ellos";
+						else print "ellos";
+					4, 10:
+						if (capitalized) print "Ellas";
+						else print "ellas";
+					5, 11:
+						if (capitalized) print "Ellos";
+						else print "ellos";
+				}
+				return true;
+			}
+			return false;
+		],
+		!!----------------------------------------------------------------------
+		!! Imprime una dirección web.
+		!!
+		!!	@param {string} website - Dirección web
+		!!	@returns {boolean} Verdadero
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		website_hyperlink [ txt;
+			#Ifdef USE_VORPLE;
+			if (isVorpleSupported()) VorpleLinkWebsiteText(txt, txt);
+			else print (stressed) txt;
+			#Ifnot;
+			print (stressed) txt;
+			#Endif; ! USE_VORPLE;
+			return true;
+		],
+		!!----------------------------------------------------------------------
+		!! Guarda en un fichero de texto externo los parámetros de
+		!! configuración de la aplicación.
+		!!
+		!!	@param {string} file_name - Nombre del fichero de texto en que se
+		!!		escriben los parámetros de configuración
+		!!	@returns {boolean} Verdadero si el fichero se escribe con éxito.
+		!!		Falso en caso contrario
+		!!	@version 1.0
+		!!----------------------------------------------------------------------
+		write_configuration_file [ file_name
+			file_ref str i temp_txt temp_code;
+			!! FIXME - comprobar que el intérprete soporte la lectura/escritura
+			#Ifdef TARGET_GLULX;
+			!!	glk_fileref_create_by_name(
+			!!		fileusage_Data + fileusage_BinaryMode,
+			!!		ChangeAnyToCString(file_name), 0);
+			file_ref = glk($0061, $00+$000, ChangeAnyToCString(file_name), 0);
+			if (file_ref ~= 0) {
+				!!	glk_stream_open_file(fileref, filemode_Write, 0);
+				str = glk($0042, file_ref, $01, 0);
+				glk($0063, file_ref); ! glk_fileref_destroy
+				glk($0047, str); ! glk_stream_set_current
+				!! Escritura en fichero de los parámetros de configuración:
+				for (i = 1 : i <= 2 : i++) {
+					switch (i) {
+						1:	temp_txt = "objetos destacados";
+						2:	temp_txt = "otros objetos";
+					}
+					print self.get_hyperlinks_status(i), " # Hipervínculos
+					asociados a ", (string) temp_txt, " {0:desactivados,
+					1:activados}^";
+				}
+				for (i = 1 : i <= 2 : i++) {
+					switch (i) {
+						1:	temp_txt = "objetos destacados";
+						2:	temp_txt = "otros objetos";
+					}
+					switch (self.get_highlight_style(i)) {
+						TEXT_STYLE_UPRIGHT:		temp_code = 0;
+						TEXT_STYLE_STRESSED:	temp_code = 1;
+						TEXT_STYLE_NOTE:		temp_code = 2;
+						TEXT_STYLE_IMPORTANT:	temp_code = 3;
+						TEXT_STYLE_HEADER:		temp_code = 4;
+						TEXT_STYLE_MONOSPACED:	temp_code = 5;
+						TEXT_STYLE_REVERSED:	temp_code = 6;
+						TEXT_STYLE_USER1:		temp_code = 7;
+					}
+					print temp_code, " # Estilo de texto de ",
+					(string) temp_txt, " [0-7]^";
+				}
+				!! Cierra el archivo y termina la operaci�n:
+				glk($002F, gg_mainwin); ! glk_set_window
+				glk($0044, str, 0); ! glk_stream_close
+				return true;
+			}
+			#Ifnot; ! TARGET_ZCODE;
+			!! (Por evitar alertas del compilador)
+			file_name = file_ref + str + i + temp_txt + temp_code;
+			#Endif; ! TARGET_
+
+			return false;
+		],
+ private
+		!!----------------------------------------------------------------------
+		!! ATRIBUTOS PRIVADOS
+		!!----------------------------------------------------------------------
+		!! Estilos de texto resaltado:
+		highlight_styles
+			DEFAULT_HIGHLIGHT_ST_1			! (objetos destacados)
+			DEFAULT_HIGHLIGHT_ST_2,			! (otros objetos)
+		!! Estados de los hipervínculos:
+		hyperlinks_status
+			DEFAULT_HYPERLINKS_STATUS_1		! (objetos destacados)
+			DEFAULT_HYPERLINKS_STATUS_2,	! (otros objetos)
+		!!----------------------------------------------------------------------
+		!! MÉTODOS PRIVADOS
+		!!----------------------------------------------------------------------
+		!! Crea un hipervínculo en Vorple:
+		create_vorple_hyperlink [ item alternative;
+			#Ifdef USE_VORPLE;
+			if (isVorpleSupported()) {
+				bp_output_stream(3, _hyperlinks_temp_array, LEN_HUGEHUGESTR);
+				self.print_object_short_name(item);
+				bp_output_stream(-3);
+				if (alternative) {
+					VorpleLinkCommandText(_hyperlinks_temp_array, alternative);
+				} else {
+					VorpleLinkCommand(_hyperlinks_temp_array);
+				}
+			} else {
+				if (alternative) print (string) alternative;
+				else self.print_object_short_name(item);
+			}
+			#Endif; ! USE_VORPLE;
+			item = alternative = 0; ! (por evitar alertas del compilador)
+			return true;
+		],
+		!! Imprime el nombre corto de un objeto/una cadena de caracteres dada:
+		print_object_short_name [ obj;
+			if (metaclass(obj) == String) {
+				print (string) obj;
+				jump shortNamePrinted;
+			}
+			#Ifdef LanguagePrintShortName;
+			if (LanguagePrintShortName(obj)) {
+				jump shortNamePrinted;
+			}
+			#Endif; ! LanguagePrintShortName;
+			if (indef_mode && obj.&short_name_indef ~= 0
+				&& PrintOrRun(obj, short_name_indef, 1) ~= 0) {
+				jump shortNamePrinted;
+			}
+			if (obj.&short_name ~= 0 && PrintOrRun(obj, short_name, 1) ~= 0) {
+				jump shortNamePrinted;
+			}
+			print (object) obj;
+			.shortNamePrinted;
+			return true;
+		],
+;
+
+[ printx str; Util.extended_print(str, 0, -1); ];

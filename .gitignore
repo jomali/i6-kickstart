@@ -1,0 +1,37 @@
+
+# Ramas del árbol de directorios:
+/dist
+/empaquetador
+/font
+*.wav
+
+# Ejecutables Máquina-Z/Glulx/Windows:
+*.z5
+*.z8
+*.zblorb
+*.ulx
+*.blb
+*.gblorb
+*.exe
+
+# Ficheros multimedia:
+*.ico
+*.mp3
+*.mp4
+*.ogg
+*.png
+*.psd
+*.vid
+
+# Ficheros de documentación:
+*.aux
+*.bbl
+*.blg
+*.doc
+*.dvi
+*.lof
+*.log
+*.lot
+*.out
+*.pdf
+*.toc

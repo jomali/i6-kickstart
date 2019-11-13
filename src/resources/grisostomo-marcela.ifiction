@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+    <story>
+        <identification>
+            <ifid>77E12660-E4E4-4C45-94E3-6BCD5F24629A</ifid>
+            <format>glulx</format>
+        </identification>
+        <bibliographic>
+            <title>Historia de Grisostomo y Marcela</title>
+            <author>J. Francisco Martin Lisaso</author>
+            <language>ES</language>
+            <headline>Una escena pastoral interactiva</headline>
+            <genre>non_fiction</genre>
+            <forgiveness>merciful</forgiveness>
+            <description></description>
+        </bibliographic>
+        <contacts>
+            <authoremail>jfm.lisaso@gmail.com</authoremail>
+            <url>https://jomali.itch.io/</url>
+        </contacts>
+        <release>
+            <version>1</version>
+            <releasedate>2018/11/16</releasedate>
+        </release>
+        <colophon>
+            <generator>Babble</generator>
+            <originated>2018/11/16</originated>
+        </colophon>
+    </story>
+</ifindex>
