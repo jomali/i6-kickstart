@@ -1,41 +1,39 @@
 
 !!==============================================================================
 !!
-!!	EL BARÓN
+!!	KICKSTART
 !!	Menú de opciones
 !!
 !!==============================================================================
 !!
-!!	Archivo:		baron_menu.inf
-!!	Autor(es):		Victor Gijsbers
-!!					J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Archivo:		kickstart_menu.inf
+!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
 !!	Idioma:			ES (Español)
 !!	Sistema:		Inform-INFSP 6
 !!	Plataforma:		Máquina-Z/Glulx
 !!	Versión:		0.0
-!!	Fecha:			2019/06/XX
+!!	Fecha:			2019/MM/DD
 !!
 !!------------------------------------------------------------------------------
 !!
-!!	Este archivo forma parte de la ficción interactiva EL BARÓN.
+!!	Este archivo forma parte de la ficción interactiva KICKSTART.
 !!
-!!	EL BARÓN es software libre: usted puede redistribuirlo y/o
+!!	KICKSTART es software libre: usted puede redistribuirlo y/o
 !!	modificarlo bajo los términos de la Licencia Pública General
 !!	GNU publicada por la Fundación para el Software Libre, ya
 !!	sea la versión 3 de la Licencia, o (a su elección) cualquier
 !!	versión posterior.
 !!
-!!	EL BARÓN se distribuye con la esperanza de que sea útil,
+!!	KICKSTART se distribuye con la esperanza de que sea útil,
 !!	pero SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
 !!	MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
 !!	Consulte los detalles de la Licencia Pública General GNU
 !!	para más información.
 !!
 !!	Debería haber recibido una copia de la Licencia Pública
-!!	General GNU junto a EL BARÓN. En caso contrario, consulte
+!!	General GNU junto a KICKSTART. En caso contrario, consulte
 !!	<http://www.gnu.org/licenses/>.
 !!
-!!	Copyright (c) 2004, Victor Gijsbers
 !!	Copyright (c) 2019, J. Francisco Martín
 !!
 !!------------------------------------------------------------------------------
@@ -74,33 +72,25 @@ Object	MainMenu "(Main Menu)"
 			while (~~done) {
 				width = ScreenWidth() - 2;
 				Utils.erase_window();
-				Utils.set_status_bar_contents("EL BARÓN");
+				Utils.set_status_bar_contents(Story);
 				new_line;
 				print (strong) Story;
-				new_line;
-				print "De Victor Gijsbers";
 				new_line;
 				new_line;
 				new_line;
 				previous_style = Utils.set_text_style(TEXT_STYLE_MONOSPACED);
-				for (i = 1 : i <= 6 : i++) {
+				for (i = 1 : i <= 4 : i++) {
 					switch (i) {
 						1:
-							line = "Recapitulación de elecciones ";
-							op = " E";
-						2:
-							line = "Prefacio ";
-							op = " P";
-						3:
 							line = "Empezar la historia ";
 							op = " [ESPACIO]";
-						4:
+						2:
 							line = "Recuperar partida ";
 							op = " R";
-						5:
+						3:
 							line = "Opciones ";
 							op = " X";
-						6:
+						4:
 							line = "Salir de la aplicación ";
 							op = " Q";
 					}
@@ -135,23 +125,8 @@ Object	MainMenu "(Main Menu)"
 				switch (Utils.press_any_key()) {
 					32, -6: ! INTRO / ESPACIO
 						done = true;
-						result = GrutaVestibulo;
-						if (~~ini) PlayerTo(GrutaVestibulo);
-					'E', 'e':
-						Utils.erase_window();
-						Utils.set_status_bar_contents("Recapitulación de elecciones");
-						new_line;
-						print (parser) "Recapitulación de elecciones";
-						new_line;
-						Utils.press_any_key();
-					'P', 'p': ! Prefacio
-						Utils.erase_window();
-						Utils.set_status_bar_contents("Prefacio");
-						new_line;
-						self.print_foreword();
-						new_line;
-						new_line;
-						Utils.press_any_key("Pulsa una tecla.");
+						result = Localidad;
+						if (~~ini) PlayerTo(Localidad);
 					'Q', 'q':
 						Utils.erase_window();
 						new_line;
@@ -176,32 +151,8 @@ Object	MainMenu "(Main Menu)"
 					#Ifdef DEBUG;
 					'1':
 						done = true;
-						result = GrutaVestibulo;
-						if (~~ini) PlayerTo(GrutaVestibulo);
-					'2':
-						done = true;
-						result = DormitorioBaron;
-						if (~~ini) PlayerTo(DormitorioBaron);
-					'3':
-						done = true;
-						result = CaminoBosque;
-						if (~~ini) PlayerTo(CaminoBosque);
-					'4':
-						done = true;
-						result = EntradaCastillo;
-						if (~~ini) PlayerTo(EntradaCastillo);
-					'5':
-						done = true;
-						result = PatioArmas;
-						if (~~ini) PlayerTo(PatioArmas);
-					'6':
-						done = true;
-						result = Camara;
-						if (~~ini) PlayerTo(Camara);
-					'7':
-						done = true;
-						result = DescansilloFinal;
-						if (~~ini) PlayerTo(DescansilloFinal);
+						result = Localidad;
+						if (~~ini) PlayerTo(Localidad);
 					#Endif; ! DEBUG;
 				}
 			}
@@ -220,37 +171,19 @@ Object	MainMenu "(Main Menu)"
 		menu_web [ ini
 			result;
 			Utils.erase_window();
-			Utils.set_status_bar_contents("EL BARÓN");
+			Utils.set_status_bar_contents(Story);
 			new_line;
 			Banner();
 			new_line;
 			print (parser) "Haz clic con el ratón o pulsa una tecla para empezar.";
 			switch (Utils.press_any_key()) {
 				32, -6: ! INTRO / ESPACIO
-					result = GrutaVestibulo;
-					if (~~ini) PlayerTo(GrutaVestibulo);
+					result = Localidad;
+					if (~~ini) PlayerTo(Localidad);
 				#Ifdef DEBUG;
 				'1':
-					result = GrutaVestibulo;
-					if (~~ini) PlayerTo(GrutaVestibulo);
-				'2':
-					result = DormitorioBaron;
-					if (~~ini) PlayerTo(DormitorioBaron);
-				'3':
-					result = CaminoBosque;
-					if (~~ini) PlayerTo(CaminoBosque);
-				'4':
-					result = EntradaCastillo;
-					if (~~ini) PlayerTo(EntradaCastillo);
-				'5':
-					result = PatioArmas;
-					if (~~ini) PlayerTo(PatioArmas);
-				'6':
-					result = Camara;
-					if (~~ini) PlayerTo(Camara);
-				'7':
-					result = DescansilloFinal;
-					if (~~ini) PlayerTo(DescansilloFinal);
+					result = Localidad;
+					if (~~ini) PlayerTo(Localidad);
 				#Endif; ! DEBUG;
 			}
 			Utils.erase_window();
@@ -273,36 +206,6 @@ Object	MainMenu "(Main Menu)"
 			PrintCharacterArray(utility_array_a);
 			Utils.set_text_style(previous_style);
 			new_line;
-			return true;
-		],
-		!!----------------------------------------------------------------------
-		!! Imprime el prefacio.
-		!!
-		!!	@returns {boolean} Verdadero
-		!!	@version 2019/03/22
-		!!----------------------------------------------------------------------
-		print_foreword [;
-			new_line;
-			print (strong) "PREFACIO", "^";
-			print (strong) "Elecciones temáticas en lugar de puzzles.", "^";
-			new_line;
-			print (strong) "El Barón", " no es una aventura conversacional
-			clásica. No existen puzzles o desafíos lógicos que haya que
-			resolver para continuar, ni situaciones que desemboquen en éxito o
-			fracaso; no se trata de una obra que pueda ganarse o perderse, con
-			independencia de cualesquiera sean las acciones del usuario. Se
-			trata, en sentido literal, de una ", (stressed) "ficción
-			interactiva", " antes que de un juego y su objetivo es ofrecer un
-			universo ficticio que resulte inmersivo y que el usuario pueda
-			explorar libremente junto a los diferentes temas planteados.^";
-			new_line;
-			!! TODO - a partir de aquí, revisar texto
-			print "Hay varias cuestiones de las que los usuarios deben ser conscientes mientras experimentan la narración. En primer lugar, no es posible llevar la historia a un estado en el que resulte imposible completarla. Tampoco es posible llegar a un final repentino antes del final real de la historia. Además, la narración ha sido diseñada de tal modo que casi todas las acciones con sentido en el contexto de la ficción la hacen avanzar; no hay ningún obstáculo real en el camino hasta el final. Lo que se plantea en ", (string) Story, " no es si el usuario alcanzará el final de la historia, sino cómo lo hará.^";
-			new_line;
-			print "La cuestión que deberían plantearse aquellas personas que experimenten la obra no es: ¿esta acción me ayudará a finalizar la historia? sino, más bien ¿creo que esta acción resulta apropiada, bella, perturbadora o interesante de algún modo desde un punto de vista temático? Cuando uno se encuentra con un hacha puede cogerlo o no cogerlo; en cualquier caso la historia avanzará hasta alcanzar su final. La elección es temática: ¿quieres experimentar una historia en la que el protagonista se enfrenta a sus conflictos hacha en mano, o más bien una en la que el protagonista obtiene aquello que busca desarmado?^";
-			new_line;
-			print "La historia cuenta con varios encuentros clave que pueden ser resueltos de muchas maneras diferentes. Las decisiones que tome el usuario durante estos encuentros tendrán un impacto importante en el significado de la historia. Este último punto es de lo que trata ", (string) Story, ": el usuario entra en escena como un agente creativo que puede interactuar con los temas planteados, seleccionando símbolos y acciones a través de los que puede expresarse y reflejar sus preferencias y experiencias personales.^";
-			Utils.press_any_key();
 			return true;
 		],
 ;

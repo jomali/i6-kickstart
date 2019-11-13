@@ -1,0 +1,84 @@
+
+
+!!==============================================================================
+!!
+!!	KICKSTART
+!!	Definición de localidades y objetos
+!!
+!!==============================================================================
+!!
+!!	Archivo:		kickstart_objects.xinf
+!!	Autor(es):		J. Francisco Martín <jfm.lisaso@gmail.com>
+!!	Idioma:			ES (Español)
+!!	Sistema:		Inform-INFSP 6
+!!	Plataforma:		Máquina-Z/Glulx
+!!	Versión:		0.0
+!!	Fecha:			2019/MM/DD
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	Este archivo forma parte de la ficción interactiva KICKSTART.
+!!
+!!	KICKSTART es software libre: usted puede redistribuirlo y/o
+!!	modificarlo bajo los términos de la Licencia Pública General
+!!	GNU publicada por la Fundación para el Software Libre, ya
+!!	sea la versión 3 de la Licencia, o (a su elección) cualquier
+!!	versión posterior.
+!!
+!!	KICKSTART se distribuye con la esperanza de que sea útil,
+!!	pero SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
+!!	MERCANTIL o de APTITUD PARA UN PROPÓSITO DETERMINADO.
+!!	Consulte los detalles de la Licencia Pública General GNU
+!!	para más información.
+!!
+!!	Debería haber recibido una copia de la Licencia Pública
+!!	General GNU junto a KICKSTART. En caso contrario, consulte
+!!	<http://www.gnu.org/licenses/>.
+!!
+!!	Copyright (c) 2019, J. Francisco Martín
+!!
+!!------------------------------------------------------------------------------
+!!
+!!	TABLA DE CONTENIDOS
+!!
+!!	1)
+!!
+!!------------------------------------------------------------------------------
+
+
+!!==============================================================================
+!!
+!!	1)	En algún lugar…
+!!
+!!------------------------------------------------------------------------------
+
+!! @Localidad
+Room	Localidad "En algún lugar..."
+ has	male,
+ with	name_f	'babia' 'parte',
+		name_m	'limbo' 'lugar' 'sueno' 'vacio',
+		gender	G_MASCULINO,
+		adjectives 'algun' 'alguna',
+		!!------------------
+		description [;
+			print "Más allá de la barrera casi insuperable que separa la realidad de todo lo demás. Un lugar etéreo, donde la vida, la materia y la vitalidad no son necesariamente constantes; un lugar donde el tiempo y el espacio no existen tal y como los capta nuestro ser despierto…";
+			if (self hasnt visited) {
+				print " *bienvenido al mundo del sueño*.";
+			}
+			new_line;
+			return true;
+		],
+;
+
+!! @Protagonista
+Character	-> Protagonista "protagonista"
+ has	male remarkable,
+ with	name_m 'personaje' 'protagonista',
+		gender G_MASCULINO,
+		!!------------------
+		description [;
+			print "Tan buen aspecto como siempre.";
+			new_line;
+			return true;
+		],
+;

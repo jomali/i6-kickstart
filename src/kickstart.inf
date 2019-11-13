@@ -3,6 +3,7 @@
 !% -S
 !% -s
 !% +language_name=Spanish
+!% $MAX_PROP_TABLE_SIZE=100000
 !% $MAX_STATIC_DATA=25000
 !% $MAX_VERBSPACE=4800
 
@@ -73,12 +74,11 @@
 !!	<>	Control de las extensiones utilizadas por la obra
 !!	<>	Definiciones generales
 !!	<>	Definiciones de la librería Inform
-!!	<>	Configuración de la extensión 'choiceSet'
+!!	<>	Configuración de la extensión 'choiceSets'
 !!	<>	Configuración de la interfaz gráfica con 'GWindows'
 !!	<>	Configuración de la extensión 'hyperlinks'
 !!	<>	Configuración de la librería de mensajes 'SpanishLM'
 !!	<>	Configuración de la extensión 'textStyles'
-
 !!------------------------------------------------------------------------------
 
 !!------------------------------------------------------------------------------
@@ -109,6 +109,8 @@ Constant VERSION_DESKTOP;
 #Ifdef VERSION_WEB_MOBILE;
 !! Utilización de la interfaz Vorple:
 Constant USE_VORPLE;
+!! Se evita que Vorple reescriba las rutinas de Inform:
+Constant VORPLE_NO_REPLACES;
 #Ifnot; ! VERSION_DESKTOP;
 !! Utilización del gestor de audio:
 Constant USE_DAMUSIX;
@@ -134,15 +136,7 @@ Constant CHOICE_OBJECT 4;
 Constant OTHER_OBJECT 1;
 
 !! Nombre del fichero de configuración:
-Constant CONFIG_FILE_NAME "marcela.params";
-
-!! Estilos de texto por defecto para las palabras destacadas:
-Constant DEFAULT_HIGHLIGHT_ST_1 TEXT_STYLE_UPRIGHT;
-Constant DEFAULT_HIGHLIGHT_ST_2 TEXT_STYLE_UPRIGHT;
-
-!! Estado por defecto de los hipervínculos:
-Constant DEFAULT_HYPERLINKS_STATUS_1 1;
-Constant DEFAULT_HYPERLINKS_STATUS_2 1;
+Constant CONFIG_FILE_NAME "kickstart.params";
 
 !! Referencias a los recursos multimedia en Máquina-Z:
 #Ifdef TARGET_ZCODE;
@@ -151,11 +145,6 @@ Constant DEFAULT_HYPERLINKS_STATUS_2 1;
 #Ifndef USE_EXTENDED_LIBRARY;
 Attribute described;
 #Endif; ! USE_EXTENDED_LIBRARY;
-
-!! Se evita que Vorple reescriba las rutinas de Inform:
-#Ifdef USE_VORPLE;
-Constant VORPLE_NO_REPLACES;
-#Endif; ! USE_VORPLE;
 
 !!------------------------------------------------------------------------------
 !!	Definiciones de la librería Inform
@@ -174,7 +163,7 @@ Constant WITHOUT_DIRECTIONS;	! Se omiten las dir. por defecto de la lib.
 #Endif; ! USE_EXTENDED_LIBRARY;
 
 !!------------------------------------------------------------------------------
-!!	Configuración de la extensión 'choiceSet'
+!!	Configuración de la extensión 'choiceSets'
 !!------------------------------------------------------------------------------
 
 Constant CSET_STYLE 1;
@@ -192,11 +181,11 @@ Constant CSET_NO_MSG "Listado de opciones vacío";
 
 #Ifdef TARGET_GLULX;
 #Ifdef USE_GWINDOWS;
-Constant GUICONFIG_MARGIN_COLOR $F2E1C5; ! #F2E1C5
+Constant GUICONFIG_MARGIN_COLOR $202020; ! #202020
 Object	GUIConfig "(GUI Configuration)"
  with	!!----------------------------------------------------------------------
 		graphic_window_flag true,	! estado de las ventanas gráficas
-		status_bar_height 0,		! altura de la barra de estado (en filas)
+		status_bar_height 1,		! altura de la barra de estado (en filas)
 		!!----------------------------------------------------------------------
 		!! Configuración por defecto A. Ancho de ventana >= threshold_A
 		graphic_width_A 0 0,	! (px)
@@ -214,9 +203,9 @@ Object	GUIConfig "(GUI Configuration)"
 		padding_C 0 0 8 0,		! (px)
 		threshold_C 660,		! (px)
 		!! Configuración por defecto D. Ancho de ventana >= threshold_D
-		graphic_width_D 0 0,	! (px)
-		margin_D 0 18,			! (%)
-		padding_D 0 0 8 0,		! (px)
+		graphic_width_D 80 80,	! (px)
+		margin_D 10 10,			! (%)
+		padding_D 40 40 40 40,		! (px)
 		threshold_D 900,		! (px)
 		!! Configuración por defecto E. Ancho de ventana >= threshold_E
 		graphic_width_E 0 0,	! (px)
@@ -280,12 +269,40 @@ Default THIRD_PERSON_FUTURE		= 9;
 !!	Configuración de la extensión 'textStyles'
 !!------------------------------------------------------------------------------
 
-!! Color frontal para el estilo de texto encabezado:
-Constant HEADER_STYLE_FGC $CD9C4D; ! #CD9C4D
-!! Color de fondo del estilo de texto Usuario 1:
-Constant USR1_STYLE_BGC	$E9CDA0; ! #E9CDA0
+!! Configuración de aspecto para el estilo de texto HEADER:
+Constant HEADER_STYLE_BOLD 1;
+Constant HEADER_STYLE_ITALIC 0;
 
-Constant TEXT_STYLE_PARSER TEXT_STYLE_STRESSED;
+!! Configuración de aspecto para el estilo de texto INPUT:
+Constant INPUT_STYLE_BOLD 0;
+Constant INPUT_STYLE_ITALIC 1;
+
+!! Configuración de aspecto para el estilo de texto NOTE:
+Constant NOTE_STYLE_FGC $E06666; ! #E06666
+Constant NOTE_STYLE_BOLD 1;
+Constant NOTE_STYLE_ITALIC 0;
+
+!! Configuración de aspecto para el estilo de texto QUOTE:
+Constant QUOTE_STYLE_FGC $6D9EEB; ! #6D9EEB
+Constant QUOTE_STYLE_BOLD 1;
+Constant QUOTE_STYLE_ITALIC 1;
+
+!! Configuración de aspecto para el estilo de texto REVERSED:
+Constant REVERSED_STYLE_BOLD 0;
+Constant REVERSED_STYLE_ITALIC 0;
+
+!! Configuración de aspecto para el estilo de texto USER1:
+Constant USR1_STYLE_BGC	$303030; ! #303030
+Constant USR1_STYLE_BOLD 0;
+Constant USR1_STYLE_ITALIC 0;
+
+!! Configuración de aspecto para el estilo de texto USER2:
+Constant USR2_STYLE_FGC	$606060; ! #606060
+Constant USR2_STYLE_BOLD 0;
+Constant USR2_STYLE_ITALIC 1;
+
+!! Configuración del estilo de texto de mensajes extradiegéticos:
+Constant TEXT_STYLE_PARSER TEXT_STYLE_USER2;
 Constant TEXT_STYLE_PARSER_PREFIX "[";
 Constant TEXT_STYLE_PARSER_SUFIX "]";
 
@@ -350,7 +367,7 @@ Include "SpanishLM.h";			! Mensajes de la librería
 Include ">kickstart_lib.inf";	! Personalizaciones de la librería
 #Endif; ! USE_EXTENDED_LIBRARY;
 
-Include ">marcela_langLM.inf";	! Mensajes personalizados de la librería
+Include ">kickstart_langLM.inf"; ! Mensajes personalizados de la librería
 
 #Ifdef USE_GWINDOWS;
 Include "gwincls.h";			! GWindows: Window Class Framework
@@ -471,8 +488,8 @@ Include "gwincls.h";			! GWindows: Window Class Framework
 !!		'Initialise()') se hace la invocación 'InitGlkWindow(0)'. Aquí se
 !!		pueden efectuar cualesquiera inicializaciones de ventanas Glk (se debe
 !!		tener en cuenta, no obstante, que las ventanas de texto principal y de
-!!		estado pueden estar ya inicializadas ---por ejemplo si el usuario acaba
-!!		de utilizar la instrucción RESTART---). Este es un buen momento para
+!!		estado pueden estar ya inicializadas —por ejemplo si el usuario acaba
+!!		de utilizar la instrucción RESTART—). Este es un buen momento para
 !!		establecer 'gg_statuswin_size' a un valor distinto de 1. Retornar 0
 !!		para proceder con el resto de inicializaciones de ventanas por defecto
 !!		de la librería, o 1 si ya se han inicializado todas las ventanas
@@ -539,44 +556,105 @@ Include "gwincls.h";			! GWindows: Window Class Framework
 	    !! Sugerencias de aspecto de 'textStyles':
 	    InitialiseStyleHints(winrock, wintype);
 
-		!! Propuestas de estilo de texto personalizado: Encabezado
-		!!		glk_stylehint_set(
-		!!			wintype_AllTypes,
-		!!			style_Header,
-		!!			stylehint_TextColor,
-		!!			HEADER_STYLE_FGC
-		!!		);
+		!! Sugerencias de aspecto del estilo HEADER:
+		#Ifdef HEADER_STYLE_BOLD;
+		glk($00B0, 3, 3, 4, HEADER_STYLE_BOLD);
+		#Endif; ! HEADER_STYLE_BOLD
+		#Ifdef HEADER_STYLE_ITALIC;
+		glk($00B0, 3, 3, 5, HEADER_STYLE_ITALIC);
+		#Endif; ! HEADER_STYLE_ITALIC
 		#Ifdef HEADER_STYLE_FGC;
-		glk($00B0, 0, 3, 7, HEADER_STYLE_FGC);
+		glk($00B0, 3, 3, 7, HEADER_STYLE_FGC);
 		#Endif; ! HEADER_STYLE_FGC
+		#Ifdef HEADER_STYLE_BGC;
+		glk($00B0, 3, 3, 8, HEADER_STYLE_BGC);
+		#Endif; ! HEADER_STYLE_BGC
 
-		!! Propuestas de estilo de texto personalizado: Usuario 1
-		!!		glk_stylehint_set(
-		!!			wintype_AllTypes,
-		!!			style_User1,
-		!!			stylehint_TextColor / stylehint_BackColor,
-		!!			USR1_STYLE_FGC / USR1_STYLE_BGC
-		!!		);
+		!! Sugerencias de aspecto del estilo INPUT:
+		#Ifdef INPUT_STYLE_BOLD;
+		glk($00B0, 3, 8, 4, INPUT_STYLE_BOLD);
+		#Endif; ! INPUT_STYLE_BOLD
+		#Ifdef INPUT_STYLE_ITALIC;
+		glk($00B0, 3, 8, 5, INPUT_STYLE_ITALIC);
+		#Endif; ! INPUT_STYLE_ITALIC
+		#Ifdef INPUT_STYLE_FGC;
+		glk($00B0, 3, 8, 7, INPUT_STYLE_FGC);
+		#Endif; ! INPUT_STYLE_FGC
+		#Ifdef INPUT_STYLE_BGC;
+		glk($00B0, 3, 8, 8, INPUT_STYLE_BGC);
+		#Endif; ! INPUT_STYLE_BGC
+
+		!! Sugerencias de aspecto del estilo NOTE:
+		#Ifdef NOTE_STYLE_BOLD;
+		glk($00B0, 3, 6, 4, NOTE_STYLE_BOLD);
+		#Endif; ! NOTE_STYLE_BOLD
+		#Ifdef NOTE_STYLE_ITALIC;
+		glk($00B0, 3, 6, 5, NOTE_STYLE_ITALIC);
+		#Endif; ! NOTE_STYLE_ITALIC
+		#Ifdef NOTE_STYLE_FGC;
+		glk($00B0, 3, 6, 7, NOTE_STYLE_FGC);
+		#Endif; ! NOTE_STYLE_FGC
+		#Ifdef NOTE_STYLE_BGC;
+		glk($00B0, 3, 6, 8, NOTE_STYLE_BGC);
+		#Endif; ! NOTE_STYLE_BGC
+
+		!! Sugerencias de aspecto del estilo QUOTE:
+		glk($00B0, 3, 7, 6, 1); ! elimina el efecto proporcional
+		#Ifdef QUOTE_STYLE_BOLD;
+		glk($00B0, 3, 7, 4, QUOTE_STYLE_BOLD);
+		#Endif; ! QUOTE_STYLE_BOLD
+		#Ifdef QUOTE_STYLE_ITALIC;
+		glk($00B0, 3, 7, 5, QUOTE_STYLE_ITALIC);
+		#Endif; ! QUOTE_STYLE_ITALIC
+		#Ifdef QUOTE_STYLE_FGC;
+		glk($00B0, 3, 7, 7, QUOTE_STYLE_FGC);
+		#Endif; ! QUOTE_STYLE_FGC
+		#Ifdef QUOTE_STYLE_BGC;
+		glk($00B0, 3, 7, 8, QUOTE_STYLE_BGC);
+		#Endif; ! QUOTE_STYLE_BGC
+
+		!! Sugerencias de aspecto del estilo REVERSED:
+		glk($00B0, 3, 5, 9, 0); ! elimina el efecto revertido
+		#Ifdef REVERSED_STYLE_BOLD;
+		glk($00B0, 3, 5, 4, REVERSED_STYLE_BOLD);
+		#Endif; ! REVERSED_STYLE_BOLD
+		#Ifdef REVERSED_STYLE_ITALIC;
+		glk($00B0, 3, 5, 5, REVERSED_STYLE_ITALIC);
+		#Endif; ! REVERSED_STYLE_ITALIC
+		#Ifdef REVERSED_STYLE_FGC;
+		glk($00B0, 3, 5, 7, REVERSED_STYLE_FGC);
+		#Endif; ! REVERSED_STYLE_FGC
+		#Ifdef REVERSED_STYLE_BGC;
+		glk($00B0, 3, 5, 8, REVERSED_STYLE_BGC);
+		#Endif; ! REVERSED_STYLE_BGC
+
+		!! Sugerencias de aspecto del estilo USER1:
+		#Ifdef USR1_STYLE_BOLD;
+		glk($00B0, 3, 9, 4, USR1_STYLE_BOLD);
+		#Endif; ! USR1_STYLE_BOLD
+		#Ifdef USR1_STYLE_ITALIC;
+		glk($00B0, 3, 9, 5, USR1_STYLE_ITALIC);
+		#Endif; ! USR1_STYLE_ITALIC
 		#Ifdef USR1_STYLE_FGC;
-		glk($00B0, 0, 9, 7, USR1_STYLE_FGC);
-		#Endif; ! USR1_STYLE_FGC;
+		glk($00B0, 3, 9, 7, USR1_STYLE_FGC);
+		#Endif; ! USR1_STYLE_FGC
 		#Ifdef USR1_STYLE_BGC;
-		glk($00B0, 0, 9, 8, USR1_STYLE_BGC);
-		#Endif; ! USR1_STYLE_BGC;
+		glk($00B0, 3, 9, 8, USR1_STYLE_BGC);
+		#Endif; ! USR1_STYLE_BGC
 
-		!! Propuestas de estilo de texto personalizado: Usuario 2
-		!!		glk_stylehint_set(
-		!!			wintype_AllTypes,
-		!!			style_User2,
-		!!			stylehint_TextColor / stylehint_BackColor,
-		!!			USR2_STYLE_FGC / USR2_STYLE_BGC
-		!!		);
+		!! Sugerencias de aspecto del estilo USER2:
+		#Ifdef USR2_STYLE_BOLD;
+		glk($00B0, 3, 10, 4, USR2_STYLE_BOLD);
+		#Endif; ! USR2_STYLE_BOLD
+		#Ifdef USR2_STYLE_ITALIC;
+		glk($00B0, 3, 10, 5, USR2_STYLE_ITALIC);
+		#Endif; ! USR2_STYLE_ITALIC
 		#Ifdef USR2_STYLE_FGC;
-		glk($00B0, 0, 10, 7, USR2_STYLE_FGC);
-		#Endif; ! USR2_STYLE_FGC;
+		glk($00B0, 3, 10, 7, USR2_STYLE_FGC);
+		#Endif; ! USR2_STYLE_FGC
 		#Ifdef USR2_STYLE_BGC;
-		glk($00B0, 0, 10, 8, USR2_STYLE_BGC);
-		#Endif; ! USR2_STYLE_BGC;
+		glk($00B0, 3, 10, 8, USR2_STYLE_BGC);
+		#Endif; ! USR2_STYLE_BGC
 	}
     !! Se continúa con el proceso normal de la librería:
     return false;
@@ -628,15 +706,35 @@ Include "vorple-screen-effects.h";
 !!	6)	Puntos de entrada de la librería Inform y del resto de extensiones
 !!
 !!------------------------------------------------------------------------------
+!!	<>	AfterPrompt()
 !!	<>	BeforeParsing()
 !!	<>	BeforeSettingTextStyle()
-!!	<>	GamePreRoutine()
+!!	<>	GamePostRoutine()
 !!	<>	Initialise()
 !!	<>	InScope()
 !!	<>	MyVorplePrompt()
 !!	<>	PrintVerb()
 !!	<>	UnknownVerb()
 !!------------------------------------------------------------------------------
+
+!!------------------------------------------------------------------------------
+!! Punto de entrada invocado justo tras la impresión del inductor (prompt); es
+!! decir, después de que todas las impresiones en pantalla derivadas del turno
+!! actual hayan finalizado.
+!!
+!!	@returns Nada
+!!	@version 2019/06/24
+!!------------------------------------------------------------------------------
+[ AfterPrompt;
+	#Ifdef USE_VORPLE;
+	!! Simula el evento de haber dejado de pulsar una de las teclas para
+	!! resaltar palabras clave, de modo que tras cada acción ejecutada, las
+  	!! palabras clave vuelven a dejar de estar resaltadas:
+	VorpleExecuteJavaScriptCommand(BuildCommand("
+		ifjs.keyUp({ keyCode: ifjs.config.highlightKeyCodes[0] });
+	"));
+	#Endif; ! USE_VORPLE;
+];
 
 !!------------------------------------------------------------------------------
 !! Permite manipular la entrada de usuario antes de que sea analizada por la
@@ -647,9 +745,12 @@ Include "vorple-screen-effects.h";
 !! una con la otra, y puede dejar el contador de palabras en cualquier punto.
 !!
 !!	@returns Nada
+!!	@version 2019/07/15
 !!------------------------------------------------------------------------------
 [ BeforeParsing;
+	!! #Ifdef CHOICE_SETS; FIXME
 	ChoiceSetManager.run();
+	!! #Endif; ! CHOICE_SETS; FIXME
 	#Ifdef PARSING_PREPROCESSOR;
 	ParsingPreprocessor.run();
 	#Endif; ! PARSING_PREPROCESSOR;
@@ -665,6 +766,7 @@ Include "vorple-screen-effects.h";
 !!	@returns {boolean} Verdadero para interrumpir la ejecución normal de la
 !!		rutina de selección de estilo de texto. Falso para continuar
 !!		normalmente
+!!	@version 2019/06/18
 !!------------------------------------------------------------------------------
 #Ifdef TEXT_STYLES;
 [ BeforeSettingTextStyle previous_style next_style
@@ -672,12 +774,12 @@ Include "vorple-screen-effects.h";
 	#Ifdef USE_VORPLE;
 	if (isVorpleSupported()) {
 		!! Finaliza los estilos aplicados anteriormente:
-		if (previous_style == TEXT_STYLE_NOTE or TEXT_STYLE_QUOTE
-			or TEXT_STYLE_REVERSED) {
+		if (previous_style == TEXT_STYLE_REVERSED) {
 			applied_styles = 2;
 		} else if (previous_style == TEXT_STYLE_STRESSED
 			or TEXT_STYLE_IMPORTANT or TEXT_STYLE_MONOSPACED
-			or TEXT_STYLE_HEADER or TEXT_STYLE_INPUT
+			or TEXT_STYLE_NOTE or TEXT_STYLE_HEADER
+			or TEXT_STYLE_INPUT or TEXT_STYLE_QUOTE
 			or TEXT_STYLE_USER1 or TEXT_STYLE_USER2) {
 			applied_styles = 1;
 		} else { ! (previous_style == TEXT_STYLE_UPRIGHT)
@@ -702,11 +804,9 @@ Include "vorple-screen-effects.h";
 			TEXT_STYLE_HEADER:
 				VorpleStyle(STYLE_LARGE);
 			TEXT_STYLE_NOTE:
-				VorpleStyle(STYLE_EMPHASIS);
-				VorpleStyle(STYLE_STRONG);
+				VorpleStyle(STYLE_RED_LETTERS);
 			TEXT_STYLE_QUOTE:
-				VorpleStyle(STYLE_EMPHASIS);
-				VorpleStyle(STYLE_MONOSPACE);
+				VorpleStyle(STYLE_BLUE_LETTERS);
 			TEXT_STYLE_INPUT:
 				VorpleStyle(STYLE_FANTASY);
 			TEXT_STYLE_USER1:
@@ -725,111 +825,95 @@ Include "vorple-screen-effects.h";
 !!------------------------------------------------------------------------------
 !! Inicializaciones del relato. Esta rutina es obligatoria y, entre otras
 !! posibles inicializaciones, DEBE ESTABLECER LA LOCALIDAD INICIAL del usuario
-!! (o el objeto accesible ---contenedor o soporte--- en el que empieza).
+!! (o el objeto accesible —contenedor o soporte— en el que empieza).
 !!
 !!	@returns {boolean|integer} Verdadero o falso para continuar con la
 !!		ejecución normal de la aplicación, o 2 para suprimir la impresión de
 !!		los créditos, que de otra manera se imprimirían inmediatamente después
 !!		de llamar a la rutina
+!!	@version 2019/11/13
 !!------------------------------------------------------------------------------
-[ Initialise;
+[ Initialise
+	previous_style;
 	Utils.erase_window();
 
 	!! Inicializaciones para la VM Glulx ---------------------------------------
+	Utils.initialise_glulx();
 
-	!! Inicializaciones Vorple:
+	!! Config. de los sistemas de hipervínculos y palabras destacadas ----------
 	#Ifdef TARGET_GLULX;
-	#Ifdef USE_VORPLE;
-	VorpleInitialise();
-	#Endif; ! USE_VORPLE;
-	#Endif; ! TARGET_GLULX;
-
-	!! Establece la escucha de eventos glk para el uso de hipervínculos:
-	#Ifdef TARGET_GLULX;
-	#Ifdef USE_HYPERLINKS;
-	ListenHyperlinkEvents();
-	#Endif; ! USE_HYPERLINKS;
-	#Endif; ! TARGET_GLULX;
-
-	!! Lee el fichero de configuración:
-	#Ifdef TARGET_GLULX;
-	#Ifdef VERSION_DESKTOP;
+	!! Hipervínculos:
+	Utils.set_hyperlinks_status(REMARKABLE_OBJECT, true);
+	Utils.set_hyperlinks_status(DIRECTION_OBJECT, true);
+	Utils.set_hyperlinks_status(CHOICE_OBJECT, true);
+	Utils.set_hyperlinks_status(OTHER_OBJECT, true);
+	!! Palabras destacadas:
+	#Ifdef VERSION_WEB_MOBILE;
+	Utils.set_highlight_style(REMARKABLE_OBJECT, TEXT_STYLE_NOTE);
+	Utils.set_highlight_style(DIRECTION_OBJECT, TEXT_STYLE_QUOTE);
+	Utils.set_highlight_style(CHOICE_OBJECT, TEXT_STYLE_NOTE);
+	Utils.set_highlight_style(OTHER_OBJECT, TEXT_STYLE_NOTE);
+	#Ifnot; ! VERSION_DESKTOP;
+	Utils.set_highlight_style(REMARKABLE_OBJECT, TEXT_STYLE_NOTE);
+	Utils.set_highlight_style(DIRECTION_OBJECT, TEXT_STYLE_QUOTE);
+	Utils.set_highlight_style(CHOICE_OBJECT, TEXT_STYLE_IMPORTANT);
+	Utils.set_highlight_style(OTHER_OBJECT, TEXT_STYLE_UPRIGHT);
 	#Ifdef CONFIG_FILE_NAME;
-	Utils.read_configuration_file(CONFIG_FILE_NAME);
+	if (~~Utils.read_configuration_file(CONFIG_FILE_NAME)) {
+		print "Es posible experimentar ";
+		previous_style = Utils.set_text_style(TEXT_STYLE_HEADER);
+		print (string) Story;
+		Utils.set_text_style(previous_style);
+		print " simplemente haciendo ~clic~ con el ratón sobre las palabras ",
+		(note) "destacadas", " que vayas encontrando. ¿Quieres activar esta
+		funcionalidad?";
+		new_line;
+		new_line;
+		print (parser) "Teclea: SÍ / NO", " > ";
+		if (YesOrNo()) {
+			print (parser) "Hipervínculos activados.";
+		} else {
+			Utils.set_hyperlinks_status(REMARKABLE_OBJECT, false);
+			Utils.set_hyperlinks_status(DIRECTION_OBJECT, false);
+			Utils.set_hyperlinks_status(CHOICE_OBJECT, false);
+			Utils.set_hyperlinks_status(OTHER_OBJECT, false);
+			print (parser) "Hipervínculos desactivados.";
+		}
+		new_line;
+		new_line;
+		print "Puedes cambiar la configuración anterior en cualquier momento
+		tecleando la instrucción ~HIPERVÍNCULOS~.";
+		new_line;
+		new_line;
+		print (parser) "Pulsa una tecla.";
+		Utils.press_any_key();
+		Utils.erase_window();
+	}
 	#Endif; ! CONFIG_FILE_NAME;
-	#Endif; ! VERSION_DESKTOP;
-	#Endif; ! TARGET_GLULX;
-
-	!! Inicializa los recursos multimedia:
-
-	!! Comprobaciones del intérprete -------------------------------------------
-	#Ifdef TARGET_GLULX;
-	#Ifdef VERSION_DESKTOP;
-	!!		(~~glk_gestalt(gestalt_Graphics, 0)
-	!!		|| ~~glk_gestalt(gestalt_Sound, 0)
-	!!		|| ~~glk_gestalt(gestalt_SoundMusic, 0))
-	if (~~glk($0004, 6, 0) || ~~glk($0004, 8, 0) || ~~glk($0004, 13, 0)) {
-		print (strong) "ADVERTENCIA:", " Esta aplicación incluye contenidos
-		audiovisuales pero tu intérprete Glulx no los soporta adecuadamente y
-		no podrán ser utilizados. Se recomienda utilizar un intérprete
-		diferente para poder disfrutar de todos los contenidos gráficos y de
-		audio de la aplicación.^";
-		new_line;
-		print (parser) "Pulsa una tecla para continuar.";
-		Utils.press_any_key();
-		Utils.erase_window();
-	}
-	#Ifnot; ! VERSION_WEB_MOBILE;
-	!! XXX - La siguiente comprobación sólo funciona si previamente se invoca a
-	!! "VorpleInitialise()"
-	if (~~isVorpleSupported()) {
-		print (strong) "ADVERTENCIA:", " Estas a punto de iniciar una ",
-		(stressed) "versión reducida", " de la aplicación ideada para
-		plataformas móviles. La versión original de la aplicación utiliza
-		contenidos audiovisuales pero, puesto que las plataformas móviles no
-		los soportan, han sido desactivados. Si estás ejecutando la obra desde
-		una plataforma de escritorio se recomienda no utilizar esta versión y
-		utilizar en su lugar la versión original, con todos los recursos
-		gráficos y de audio activados.^";
-		new_line;
-		print (parser) "Pulsa una tecla para continuar.";
-		Utils.press_any_key();
-		Utils.erase_window();
-	}
 	#Endif; ! VERSION_
 	#Endif; ! TARGET_GLULX;
 
+
 	!! Inicializaciones de la obra ---------------------------------------------
-	!! Créditos:
-	new_line;
-	Banner();
-	new_line;
 
-	#Ifdef USE_VORPLE;
-	if (isVorpleSupported()) {
-		print (parser) "Haz clic con el ratón o pulsa una tecla";
-	} else {
-		print (parser) "Pulsa una tecla para empezar";
-	}
-	#Ifnot;
-	print (parser) "Pulsa una tecla para empezar";
-	#Endif; ! USE_VORPLE;
-	Utils.press_any_key();
-	Utils.erase_window();
-	new_line;
-	Utils.print_horizontal_rule();
-	new_line;
+	!! Contenidos de la barra de estado centrados en pantalla:
+	Utils.set_status_bar_alignment(1); ! 0=left; 1=center; 2=right
 
-	!! Narrador en pasado y tercera persona
-	Utils.set_grammatical_inflection(THIRD_PERSON_PAST);
+	!! Narrador en pasado y segunda persona
+	Utils.set_grammatical_inflection(SECOND_PERSON_PRESENT);
+
 	!! Establece el estilo del inventario:
 	inventory_style = ENGLISH_BIT + RECURSE_BIT + FULLINV_BIT;
+
 	!! Establece el PC (player character)
-	ChangePlayer(Quijote);
-	!! Establece la localidad inicial del relato:
-	location = Limbo;
+	ChangePlayer(Protagonista);
+
 	!! Lookmode largo:
 	lookmode = 2;
+
+	!! Menú principal:
+	location = MainMenu.run(true);
+
 	!! Se evita la impresión inicial del banner
 	return 2;
 ];
@@ -842,6 +926,7 @@ Include "vorple-screen-effects.h";
 !!	@returns {boolean} Falso para indicar al sistema que añada todos los
 !!		objetos que suelen estar por defecto al alcance, o verdadero para
 !!		indicar que no se debe añadir nada más al alcance
+!!	@version 2019/06/18
 !!------------------------------------------------------------------------------
 [ InScope person
 	item;
@@ -863,7 +948,7 @@ Include "vorple-screen-effects.h";
 !!	@returns {boolean} Verdadero si se imprime el inductor definido en la
 !!		constante PS1 (si es que existe y está bien definido). Falso en caso
 !!		contrario
-!!	@version 1.1
+!!	@version 2019/06/18
 !!------------------------------------------------------------------------------
 #Ifdef TARGET_GLULX;
 #Ifdef USE_VORPLE;
@@ -889,6 +974,7 @@ Include "vorple-screen-effects.h";
 !!	@returns {boolean} Verdadero para indicar al sistema que se ha imprimido la
 !!		forma modificada del verbo, o falso para continuar con la ejecución
 !!		normal y que el sistema imprima el verbo de la forma habitual
+!!	@version 2019/06/18
 !!------------------------------------------------------------------------------
 [ PrintVerb word;
 	if (word == 'no.verb') {
@@ -906,6 +992,7 @@ Include "vorple-screen-effects.h";
 !!	@returns {boolean} Falso para permitir que el sistema continúe con la
 !!		ejecución normal e imprima un mensaje de error, o un valor de
 !!		diccionario del verbo a utilizar en lugar del verbo desconocido
+!!	@version 2019/06/18
 !!------------------------------------------------------------------------------
 [ UnknownVerb
 	obj;
@@ -1178,6 +1265,12 @@ VerboIrregular "establecer configuración de hipervínculos"
 !!------------------------------------------------------------------------------
 !! ##DefaultAction
 !!------------------------------------------------------------------------------
+!!	Los objetos pueden definir una propiedad: 'action_set', con un array de
+!!	acciones evidentes que pueden realizarse sobre ese objeto. Si definen esta
+!!	propiedad, la acción por defecto imprime el listado de acciones. En caso
+!!	contrario, la acción por defecto se limita a invocar la acción ##Examine
+!!	sobre ese objeto.
+!!------------------------------------------------------------------------------
 
 Verb 'no.verb'
 	* noun							-> DefaultAction
@@ -1185,14 +1278,18 @@ Verb 'no.verb'
 
 [ DefaultActionSub;
 	!! Por evitar redundancias, cuando la instrucción por defecto lanza
-	!! ##Examine no se muestra aclaración de la entrada.
+	!! ##Examine sobre objetos generales, o ##Enter sobre objetos que
+	!! representan salidas, no se imprime la aclaración de la entrada.
 	!! 		previous_style = Utils.set_text_style(TEXT_STYLE_PARSER);
 	!! 		print (string) TEXT_STYLE_PARSER_PREFIX;
-	!! 		print "examina ", (name) noun;
+	!! 		print "examina / ve";
+	!! 		PrintToBuffer(utility_array_a, INPUT_BUFFER_LEN, self);
+	!! 		PrintCharacterArray(utility_array_a);
 	!! 		print (string) TEXT_STYLE_PARSER_SUFIX;
 	!! 		Utils.set_text_style(previous_style);
 	!! 		new_line;
-	<<Examine noun>>;
+	if (noun ofclass AdjacentRoom) <<Enter noun>>;
+	else <<Examine noun>>;
 ];
 
 !!------------------------------------------------------------------------------
@@ -1202,6 +1299,20 @@ Verb 'no.verb'
 Extend 'cava' first
 	*								-> Dig
 ;
+
+!!------------------------------------------------------------------------------
+!! ##Help
+!!------------------------------------------------------------------------------
+
+Verb meta 'ayuda' 'pista' 'pistas'
+	*								-> Help
+;
+VerboIrregular "mostrar ayuda" with imperativo 'ayuda';
+
+!! TODO
+[ HelpSub;
+	"", (parser) "Sistema de ayuda no disponible.";
+];
 
 !!------------------------------------------------------------------------------
 !! ##LMode2
@@ -1222,7 +1333,11 @@ Extend 'nx' replace
 	* Anything						-> NoSuchVerb
 ;
 
-Extend	'perdona' replace
+Extend 'perdona' replace
+	* Anything						-> NoSuchVerb
+;
+
+Extend 'saborea' replace
 	* Anything						-> NoSuchVerb
 ;
 
@@ -1326,6 +1441,8 @@ Verb	'conversa' 'platica'
 !!------------------------------------------------------------------------------
 
 Include ">kickstart_classes.inf";
+Include ">kickstart_menu.inf";
+Include ">kickstart_tutorial.inf";
 Include ">kickstart_utils.inf";
 
-Include ">marcela_objects.inf";
+Include ">kickstart_objects.inf";
