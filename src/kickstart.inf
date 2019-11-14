@@ -683,7 +683,7 @@ Include ">kickstart.bli";		! Recursos multimedia de la aplicación
 
 Include "arrays.h";				! Operaciones con arrays
 Include "capacities.h";			! Extensión a las reglas de capacidad
-Include "choiceSet.h";			! Sistema de selección de acciones sobre lista
+Include "choiceSets.h";			! Sistema de selección de acciones sobre lista
 Include "pPreprocessor.h";		! Preprocesador del parser
 Include "shuffle.h";			! Barajeado de números aleatorios
 
@@ -748,9 +748,9 @@ Include "vorple-screen-effects.h";
 !!	@version 2019/07/15
 !!------------------------------------------------------------------------------
 [ BeforeParsing;
-	!! #Ifdef CHOICE_SETS; FIXME
+	#Ifdef CHOICE_SETS;
 	ChoiceSetManager.run();
-	!! #Endif; ! CHOICE_SETS; FIXME
+	#Endif; ! CHOICE_SETS;
 	#Ifdef PARSING_PREPROCESSOR;
 	ParsingPreprocessor.run();
 	#Endif; ! PARSING_PREPROCESSOR;
@@ -915,6 +915,7 @@ Include "vorple-screen-effects.h";
 	location = MainMenu.run(true);
 
 	!! Se evita la impresión inicial del banner
+	new_line;
 	return 2;
 ];
 

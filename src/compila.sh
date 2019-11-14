@@ -12,7 +12,8 @@ bresc_location=~/data/bin
 zcode_interpreter=gargoyle-free
 glulx_interpreter=gargoyle-free
 
-web_location=../../nginx/html/ods/resources
+web_location_win=../../nginx/html/ods/resources
+web_location_linux=/var/www/html/ods/resources
 
 inform_path=,/usr/share/inform6/library/,/usr/share/inform6/extensions/,/usr/share/inform6/extensions/gwindows/,/usr/share/inform6/extensions/vorple/
 
@@ -52,8 +53,11 @@ fi
 if [ -e "../$gameFile.gblorb" ]; then
 	rm ../$gameFile.gblorb
 fi
-if [ -e "$web_location/$gameFile.gblorb" ]; then
-	rm $web_location/$gameFile.gblorb
+if [ -e "$web_location_win/$gameFile.gblorb" ]; then
+	rm $web_location_win/$gameFile.gblorb
+fi
+if [ -e "$web_location_linux/$gameFile.gblorb" ]; then
+	rm $web_location_linux/$gameFile.gblorb
 fi
 
 echo "============================================="
@@ -64,9 +68,11 @@ inform +include_path=$inform_path -G $gameFile.inf $gameFile.ulx
 $bresc_location/bres $gameFile.res
 inform +include_path=$inform_path -G $gameFile.inf
 $bresc_location/bresc $gameFile.res
-cp $gameFile.gblorb $web_location/$gameFile.gblorb
 mv $gameFile.gblorb ../$gameFile.gblorb
 limpia_ficheros_temporales
+#
+cp ../$gameFile.gblorb $web_location_win/$gameFile.gblorb
+cp ../$gameFile.gblorb $web_location_linux/$gameFile.gblorb
 
 echo " "
 echo -n "Pulsa cualquier tecla para ejecutar la aplicación ('q' para salir): "

@@ -166,25 +166,30 @@ Object	MainMenu "(Main Menu)"
 		!!	@param {boolean} [ini = false] - Verdadero cuando el menú se invoca
 		!!		al empezar la obra, antes de establecer la localidad inicial
 		!!	@returns {Object} Localidad de inicio de la historia
-		!!	@version 2019/06/18
+		!!	@version 2019/11/14
 		!!----------------------------------------------------------------------
 		menu_web [ ini
-			result;
-			Utils.erase_window();
-			Utils.set_status_bar_contents(Story);
-			new_line;
-			Banner();
-			new_line;
-			print (parser) "Haz clic con el ratón o pulsa una tecla para empezar.";
-			switch (Utils.press_any_key()) {
-				32, -6: ! INTRO / ESPACIO
-					result = Localidad;
-					if (~~ini) PlayerTo(Localidad);
-				#Ifdef DEBUG;
-				'1':
-					result = Localidad;
-					if (~~ini) PlayerTo(Localidad);
-				#Endif; ! DEBUG;
+			done result;
+			while (~~done) {
+				Utils.erase_window();
+				Utils.set_status_bar_contents(Story);
+				new_line;
+				Banner();
+				new_line;
+				print (parser) "Pulsa «ESPACIO» para empezar.";
+				new_line;
+				switch (Utils.press_any_key()) {
+					32, -6: ! INTRO / ESPACIO
+						done = true;
+						result = Localidad;
+						if (~~ini) PlayerTo(Localidad);
+					#Ifdef DEBUG;
+					'1':
+						done = true;
+						result = Localidad;
+						if (~~ini) PlayerTo(Localidad);
+					#Endif; ! DEBUG;
+				}
 			}
 			Utils.erase_window();
 			Utils.set_status_bar_contents(0);
